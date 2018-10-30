@@ -31,6 +31,8 @@ public class DeviceAppsPlugin implements MethodCallHandler {
         channel.setMethodCallHandler(new DeviceAppsPlugin(registrar.activeContext()));
     }
 
+    private final int SYSTEM_APP_MASK = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
+
     private final Context context;
 
     private DeviceAppsPlugin(Context context) {
@@ -69,10 +71,9 @@ public class DeviceAppsPlugin implements MethodCallHandler {
         PackageManager packageManager = context.getPackageManager();
         List<PackageInfo> apps = packageManager.getInstalledPackages(0);
         List<Map<String, Object>> installedApps = new ArrayList<>(apps.size());
-        int systemAppMask = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
 
         for (PackageInfo pInfo : apps) {
-            if (!includeSystemApps && (pInfo.applicationInfo.flags & systemAppMask) != 0) {
+            if (!includeSystemApps && isSystemApp(pInfo)) {
                 continue;
             }
 
@@ -81,6 +82,10 @@ public class DeviceAppsPlugin implements MethodCallHandler {
         }
 
         return installedApps;
+    }
+
+    private boolean isSystemApp(PackageInfo pInfo) {
+        return (pInfo.applicationInfo.flags & SYSTEM_APP_MASK) != 0;
     }
 
     private boolean isAppInstalled(String packageName) {
@@ -107,6 +112,7 @@ public class DeviceAppsPlugin implements MethodCallHandler {
         map.put("package_name", pInfo.packageName);
         map.put("version_code", pInfo.versionCode);
         map.put("version_name", pInfo.versionName);
+        map.put("system_app", isSystemApp(pInfo));
         return map;
     }
 

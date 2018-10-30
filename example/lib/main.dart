@@ -61,7 +61,8 @@ class _ListAppsPagesContent extends StatelessWidget {
                     children: <Widget>[
                       ListTile(
                           title: Text("${app.appName} (${app.packageName})"),
-                          subtitle: Text("Version : ${app.versionName}")),
+                          subtitle: Text(
+                              "Version : ${app.versionName}\nSystem app: ${app.systemApp}")),
                       Divider(
                         height: 1.0,
                       )
