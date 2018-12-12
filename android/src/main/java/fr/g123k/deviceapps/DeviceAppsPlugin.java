@@ -1,6 +1,7 @@
 package fr.g123k.deviceapps;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -62,6 +63,13 @@ public class DeviceAppsPlugin implements MethodCallHandler {
                     result.success(isAppInstalled(packageName));
                 }
                 break;
+            case "openApp":
+                if (!call.hasArgument("package_name") || TextUtils.isEmpty(call.argument("package_name").toString())) {
+                    result.error("ERROR", "Empty or null package name", null);
+                } else {
+                    String packageName = call.argument("package_name").toString();
+                    result.success(openApp(packageName));
+                }
             default:
                 result.notImplemented();
         }
@@ -82,6 +90,15 @@ public class DeviceAppsPlugin implements MethodCallHandler {
         }
 
         return installedApps;
+    }
+
+    private boolean openApp(String packageName) {
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        if (launchIntent != null) { 
+            context.startActivity(launchIntent);//null pointer check in case package name was not found
+            return true;
+        }
+        return false;
     }
 
     private boolean isSystemApp(PackageInfo pInfo) {
