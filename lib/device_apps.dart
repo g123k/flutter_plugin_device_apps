@@ -65,16 +65,18 @@ class Application {
   final String appName;
   final String packageName;
   final String versionName;
+  final String icon;
   final bool systemApp;
 
   Application._fromMap(Map map)
       : appName = map['app_name'],
         packageName = map['package_name'],
         versionName = map['version_name'],
+        icon = map['app_icon'],
         systemApp = map['system_app'];
 
   @override
   String toString() {
-    return 'App name: $appName, Package name: $packageName, Version name: $versionName';
+    return 'App name: $appName, Package name: $packageName, Version name: $versionName, icon: $icon ';
   }
 }

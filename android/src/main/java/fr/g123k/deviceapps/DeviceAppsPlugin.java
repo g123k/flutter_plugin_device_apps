@@ -5,9 +5,15 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -130,7 +136,32 @@ public class DeviceAppsPlugin implements MethodCallHandler {
         map.put("version_code", pInfo.versionCode);
         map.put("version_name", pInfo.versionName);
         map.put("system_app", isSystemApp(pInfo));
+        try {
+            Drawable icon = packageManager.getApplicationIcon(pInfo.packageName);
+            String encodedImage = encodeToBase64(getBitmapFromDrawable(icon), Bitmap.CompressFormat.PNG, 100);
+            map.put("app_icon", encodedImage);
+
+        } catch(PackageManager.NameNotFoundException ignored) {
+            return null;
+        }
         return map;
     }
+
+    private String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality) {
+
+        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+        image.compress(compressFormat, quality, byteArrayOS);
+        return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.NO_WRAP);
+    }
+
+    private Bitmap getBitmapFromDrawable(Drawable drawable) {
+        final Bitmap bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(bmp);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bmp;
+    }
+
+   
 
 }
