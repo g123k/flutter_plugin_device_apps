@@ -36,7 +36,8 @@ class _ListAppsPagesState extends State<ListAppsPages> {
           )
         ],
       ),
-      body: _ListAppsPagesContent(includeSystemApps: _showSystemApps),
+      body: _ListAppsPagesContent(
+          includeSystemApps: _showSystemApps, key: GlobalKey()),
     );
   }
 }
@@ -44,7 +45,8 @@ class _ListAppsPagesState extends State<ListAppsPages> {
 class _ListAppsPagesContent extends StatelessWidget {
   final bool includeSystemApps;
 
-  _ListAppsPagesContent({this.includeSystemApps: false});
+  const _ListAppsPagesContent({Key key, this.includeSystemApps: false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

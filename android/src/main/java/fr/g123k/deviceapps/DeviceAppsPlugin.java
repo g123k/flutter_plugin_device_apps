@@ -7,11 +7,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -23,27 +21,33 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.view.FlutterNativeView;
 
 /**
  * DeviceAppsPlugin
  */
-public class DeviceAppsPlugin implements MethodCallHandler {
+public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewDestroyListener {
 
     /**
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "g123k/device_apps");
-        channel.setMethodCallHandler(new DeviceAppsPlugin(registrar.activeContext()));
+        DeviceAppsPlugin plugin = new DeviceAppsPlugin(registrar.activeContext());
+        registrar.addViewDestroyListener(plugin);
+        channel.setMethodCallHandler(plugin);
     }
 
     private final int SYSTEM_APP_MASK = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
 
     private final Context context;
+    private final AsyncWork asyncWork;
 
     private DeviceAppsPlugin(Context context) {
         this.context = context;
+        this.asyncWork = new AsyncWork();
     }
 
     @Override
@@ -52,7 +56,7 @@ public class DeviceAppsPlugin implements MethodCallHandler {
             case "getInstalledApps":
                 boolean systemApps = call.hasArgument("system_apps") && (Boolean) (call.argument("system_apps"));
                 boolean includeAppIcons = call.hasArgument("include_app_icons") && (Boolean) (call.argument("include_app_icons"));
-                result.success(getInstalledApps(systemApps, includeAppIcons));
+                fetchInstalledApps(systemApps, includeAppIcons, result);
                 break;
             case "getApp":
                 if (!call.hasArgument("package_name") || TextUtils.isEmpty(call.argument("package_name").toString())) {
@@ -81,6 +85,16 @@ public class DeviceAppsPlugin implements MethodCallHandler {
             default:
                 result.notImplemented();
         }
+    }
+
+    private void fetchInstalledApps(final boolean includeSystemApps, final boolean includeAppIcons, final Result result) {
+        asyncWork.run(new Runnable() {
+
+            @Override
+            public void run() {
+                result.success(getInstalledApps(includeSystemApps, includeAppIcons));
+            }
+        });
     }
 
     private List<Map<String, Object>> getInstalledApps(boolean includeSystemApps, boolean includeAppIcons) {
@@ -166,4 +180,9 @@ public class DeviceAppsPlugin implements MethodCallHandler {
         return bmp;
     }
 
+    @Override
+    public boolean onViewDestroy(FlutterNativeView flutterNativeView) {
+        asyncWork.stop();
+        return true;
+    }
 }
