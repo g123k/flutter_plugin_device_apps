@@ -51,22 +51,32 @@ class DeviceApps {
         .invokeMethod('isAppInstalled', {'package_name': packageName});
     return isAppInstalled;
   }
+
+  static Future<bool> openApp(String packageName) async {
+    if(packageName.isEmpty) {
+      throw Exception('The package name can not be empty');
+    }
+    return await _channel.invokeMethod('openApp',{'package_name': packageName});
+  }
+
 }
 
 class Application {
   final String appName;
   final String packageName;
   final String versionName;
+  final String icon;
   final bool systemApp;
 
   Application._fromMap(Map map)
       : appName = map['app_name'],
         packageName = map['package_name'],
         versionName = map['version_name'],
+        icon = map['app_icon'],
         systemApp = map['system_app'];
 
   @override
   String toString() {
-    return 'App name: $appName, Package name: $packageName, Version name: $versionName';
+    return 'App name: $appName, Package name: $packageName, Version name: $versionName, icon: $icon ';
   }
 }

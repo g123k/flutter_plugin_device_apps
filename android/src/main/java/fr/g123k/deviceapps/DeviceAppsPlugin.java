@@ -1,12 +1,19 @@
 package fr.g123k.deviceapps;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +69,13 @@ public class DeviceAppsPlugin implements MethodCallHandler {
                     result.success(isAppInstalled(packageName));
                 }
                 break;
+            case "openApp":
+                if (!call.hasArgument("package_name") || TextUtils.isEmpty(call.argument("package_name").toString())) {
+                    result.error("ERROR", "Empty or null package name", null);
+                } else {
+                    String packageName = call.argument("package_name").toString();
+                    result.success(openApp(packageName));
+                }
             default:
                 result.notImplemented();
         }
@@ -82,6 +96,15 @@ public class DeviceAppsPlugin implements MethodCallHandler {
         }
 
         return installedApps;
+    }
+
+    private boolean openApp(String packageName) {
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        if (launchIntent != null) { 
+            context.startActivity(launchIntent);//null pointer check in case package name was not found
+            return true;
+        }
+        return false;
     }
 
     private boolean isSystemApp(PackageInfo pInfo) {
@@ -113,7 +136,32 @@ public class DeviceAppsPlugin implements MethodCallHandler {
         map.put("version_code", pInfo.versionCode);
         map.put("version_name", pInfo.versionName);
         map.put("system_app", isSystemApp(pInfo));
+        try {
+            Drawable icon = packageManager.getApplicationIcon(pInfo.packageName);
+            String encodedImage = encodeToBase64(getBitmapFromDrawable(icon), Bitmap.CompressFormat.PNG, 100);
+            map.put("app_icon", encodedImage);
+
+        } catch(PackageManager.NameNotFoundException ignored) {
+            return null;
+        }
         return map;
     }
+
+    private String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality) {
+
+        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+        image.compress(compressFormat, quality, byteArrayOS);
+        return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.NO_WRAP);
+    }
+
+    private Bitmap getBitmapFromDrawable(Drawable drawable) {
+        final Bitmap bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(bmp);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bmp;
+    }
+
+   
 
 }

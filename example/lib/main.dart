@@ -1,5 +1,6 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
 void main() => runApp(MaterialApp(home: ListAppsPages()));
 
@@ -54,12 +55,18 @@ class _ListAppsPagesContent extends StatelessWidget {
             return Center(child: CircularProgressIndicator());
           } else {
             List<Application> apps = data.data;
+            print(apps);
             return ListView.builder(
                 itemBuilder: (context, position) {
                   Application app = apps[position];
                   return Column(
                     children: <Widget>[
                       ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: MemoryImage(base64.decode(app.icon)),
+                            backgroundColor: Colors.white,
+                          ),
+                          onTap: () => DeviceApps.openApp(app.packageName),
                           title: Text("${app.appName} (${app.packageName})"),
                           subtitle: Text(
                               "Version : ${app.versionName}\nSystem app: ${app.systemApp}")),
