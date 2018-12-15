@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
 
 void main() => runApp(MaterialApp(home: ListAppsPages()));
 
@@ -35,7 +36,8 @@ class _ListAppsPagesState extends State<ListAppsPages> {
           )
         ],
       ),
-      body: _ListAppsPagesContent(includeSystemApps: _showSystemApps),
+      body: _ListAppsPagesContent(
+          includeSystemApps: _showSystemApps, key: GlobalKey()),
     );
   }
 }
@@ -43,13 +45,14 @@ class _ListAppsPagesState extends State<ListAppsPages> {
 class _ListAppsPagesContent extends StatelessWidget {
   final bool includeSystemApps;
 
-  _ListAppsPagesContent({this.includeSystemApps: false});
+  const _ListAppsPagesContent({Key key, this.includeSystemApps: false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: DeviceApps.getInstalledApplications(
-            includeSystemApps: includeSystemApps),
+            includeAppIcons: true, includeSystemApps: includeSystemApps),
         builder: (context, data) {
           if (data.data == null) {
             return Center(child: CircularProgressIndicator());
@@ -62,10 +65,13 @@ class _ListAppsPagesContent extends StatelessWidget {
                   return Column(
                     children: <Widget>[
                       ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: MemoryImage(base64.decode(app.icon)),
-                            backgroundColor: Colors.white,
-                          ),
+                          leading: app.icon != null
+                              ? CircleAvatar(
+                                  backgroundImage:
+                                      MemoryImage(base64.decode(app.icon)),
+                                  backgroundColor: Colors.white,
+                                )
+                              : null,
                           onTap: () => DeviceApps.openApp(app.packageName),
                           title: Text("${app.appName} (${app.packageName})"),
                           subtitle: Text(

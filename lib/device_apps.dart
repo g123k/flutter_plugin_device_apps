@@ -7,9 +7,11 @@ class DeviceApps {
       const MethodChannel('g123k/device_apps');
 
   static Future<List<Application>> getInstalledApplications(
-      {bool includeSystemApps: false}) async {
-    return _channel.invokeMethod(
-        'getInstalledApps', {'system_apps': includeSystemApps}).then((apps) {
+      {bool includeSystemApps: false, bool includeAppIcons: false}) async {
+    return _channel.invokeMethod('getInstalledApps', {
+      'system_apps': includeSystemApps,
+      'include_app_icons': includeAppIcons
+    }).then((apps) {
       if (apps != null && apps is List) {
         List<Application> list = new List();
         for (var app in apps) {
@@ -26,13 +28,16 @@ class DeviceApps {
     });
   }
 
-  static Future<Application> getApp(String packageName) async {
+  static Future<Application> getApp(String packageName,
+      [bool includeAppIcon = false]) async {
     if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
     }
 
-    return _channel
-        .invokeMethod('getApp', {'package_name': packageName}).then((app) {
+    return _channel.invokeMethod('getApp', {
+      'package_name': packageName,
+      'include_app_icon': includeAppIcon
+    }).then((app) {
       if (app != null && app is Map) {
         return Application._fromMap(app);
       }
@@ -53,12 +58,12 @@ class DeviceApps {
   }
 
   static Future<bool> openApp(String packageName) async {
-    if(packageName.isEmpty) {
+    if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
     }
-    return await _channel.invokeMethod('openApp',{'package_name': packageName});
+    return await _channel
+        .invokeMethod('openApp', {'package_name': packageName});
   }
-
 }
 
 class Application {
@@ -77,6 +82,6 @@ class Application {
 
   @override
   String toString() {
-    return 'App name: $appName, Package name: $packageName, Version name: $versionName, icon: $icon ';
+    return 'App name: $appName, Package name: $packageName, Version name: $versionName';
   }
 }
