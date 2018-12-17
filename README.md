@@ -46,11 +46,11 @@ DeviceApps.openApp('com.frandroid.app');
 
 ## Displaying app icon
 
-App Icon is received as a BASE64 Encoded string. To display the icon. `dart:convert` is required to decode base64 string.
+When calling the `getInstalledApplications()` or `getApp()` methods, you can ask for the icon.
+To display the image, just call:
 
 ```dart
-import 'dart:convert';
-Image.memory(base64.decode(app.icon))
+Image.memory(app.icon);
 ```
 
 
