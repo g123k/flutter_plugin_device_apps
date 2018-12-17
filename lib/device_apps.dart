@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
@@ -16,7 +17,7 @@ class DeviceApps {
         List<Application> list = new List();
         for (var app in apps) {
           if (app is Map) {
-            list.add(Application._fromMap(app));
+            list.add(Application(app));
           }
         }
 
@@ -39,7 +40,7 @@ class DeviceApps {
       'include_app_icon': includeAppIcon
     }).then((app) {
       if (app != null && app is Map) {
-        return Application._fromMap(app);
+        return Application(app);
       }
     }).catchError((err) {
       print(err);
@@ -70,18 +71,43 @@ class Application {
   final String appName;
   final String packageName;
   final String versionName;
-  final String icon;
   final bool systemApp;
 
+  factory Application(Map map) {
+    if (map == null || map.length == 0) {
+      throw Exception('The map can not be null!');
+    }
+
+    if (map.containsKey('app_icon')) {
+      return ApplicationWithIcon._fromMap(map);
+    } else {
+      return Application._fromMap(map);
+    }
+  }
+
   Application._fromMap(Map map)
-      : appName = map['app_name'],
+      : assert(map['app_name'] != null),
+        assert(map['package_name'] != null),
+        assert(map['version_name'] != null),
+        assert(map['system_app'] != null),
+        appName = map['app_name'],
         packageName = map['package_name'],
         versionName = map['version_name'],
-        icon = map['app_icon'],
         systemApp = map['system_app'];
 
   @override
   String toString() {
     return 'App name: $appName, Package name: $packageName, Version name: $versionName';
   }
+}
+
+class ApplicationWithIcon extends Application {
+  final String _icon;
+
+  ApplicationWithIcon._fromMap(Map map)
+      : assert(map['app_icon'] != null),
+        _icon = map['app_icon'],
+        super._fromMap(map);
+
+  get icon => base64.decode(_icon);
 }
