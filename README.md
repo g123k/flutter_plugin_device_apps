@@ -37,6 +37,22 @@ To check if an app is installed (via its package name):
 bool isInstalled = await DeviceApps.isAppInstalled('com.frandroid.app');
 ```
 
+## Open an application
+
+To open an application
+```dart
+DeviceApps.openApp('com.frandroid.app');
+```
+
+## Displaying app icon
+
+App Icon is received as a BASE64 Encoded string. To display the icon. `dart:convert` is required to decode base64 string.
+
+```dart
+import 'dart:convert';
+Image.memory(base64.decode(app.icon))
+```
+
 
 
 
