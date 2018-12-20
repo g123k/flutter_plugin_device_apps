@@ -7,10 +7,11 @@ class DeviceApps {
       const MethodChannel('g123k/device_apps');
 
   static Future<List<Application>> getInstalledApplications(
-      {bool includeSystemApps: false, bool includeAppIcons: false}) async {
+      {bool includeSystemApps: false, bool includeAppIcons: false, bool onlyAppsWithLaunchIntent: false}) async {
     return _channel.invokeMethod('getInstalledApps', {
       'system_apps': includeSystemApps,
-      'include_app_icons': includeAppIcons
+      'include_app_icons': includeAppIcons,
+      'only_apps_with_launch_intent':onlyAppsWithLaunchIntent
     }).then((apps) {
       if (apps != null && apps is List) {
         List<Application> list = new List();

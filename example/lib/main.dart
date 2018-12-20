@@ -12,6 +12,7 @@ class ListAppsPages extends StatefulWidget {
 
 class _ListAppsPagesState extends State<ListAppsPages> {
   bool _showSystemApps = false;
+  bool _onlyLaunchableApps = false;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,9 @@ class _ListAppsPagesState extends State<ListAppsPages> {
               return <PopupMenuItem<String>>[
                 PopupMenuItem<String>(
                     value: 'system_apps', child: Text('Toggle system apps')),
+                PopupMenuItem<String>(
+                  value: "launchable_apps", child: Text('Toggle launchable apps only'),
+                )
               ];
             },
             onSelected: (key) {
@@ -32,27 +36,33 @@ class _ListAppsPagesState extends State<ListAppsPages> {
                   _showSystemApps = !_showSystemApps;
                 });
               }
+              if(key == "launchable_apps"){
+                setState(() {
+                  _onlyLaunchableApps = !_onlyLaunchableApps;
+                });
+              }
             },
           )
         ],
       ),
       body: _ListAppsPagesContent(
-          includeSystemApps: _showSystemApps, key: GlobalKey()),
+          includeSystemApps: _showSystemApps, onlyAppsWithLaunchIntent: _onlyLaunchableApps, key: GlobalKey()),
     );
   }
 }
 
 class _ListAppsPagesContent extends StatelessWidget {
   final bool includeSystemApps;
+  final bool onlyAppsWithLaunchIntent;
 
-  const _ListAppsPagesContent({Key key, this.includeSystemApps: false})
+  const _ListAppsPagesContent({Key key, this.includeSystemApps: false, this.onlyAppsWithLaunchIntent: false})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: DeviceApps.getInstalledApplications(
-            includeAppIcons: true, includeSystemApps: includeSystemApps),
+            includeAppIcons: true, includeSystemApps: includeSystemApps, onlyAppsWithLaunchIntent: onlyAppsWithLaunchIntent),
         builder: (context, data) {
           if (data.data == null) {
             return Center(child: CircularProgressIndicator());
