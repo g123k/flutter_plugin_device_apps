@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 
@@ -75,10 +73,9 @@ class _ListAppsPagesContent extends StatelessWidget {
                   return Column(
                     children: <Widget>[
                       ListTile(
-                          leading: app.icon != null
+                          leading: app is ApplicationWithIcon
                               ? CircleAvatar(
-                                  backgroundImage:
-                                      MemoryImage(base64.decode(app.icon)),
+                                  backgroundImage: MemoryImage(app.icon),
                                   backgroundColor: Colors.white,
                                 )
                               : null,

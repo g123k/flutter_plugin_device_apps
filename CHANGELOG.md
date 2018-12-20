@@ -1,3 +1,7 @@
+## [1.0.3] - 17th December 2018
+
+* Some asserts added + a different class is used when an icon is passed
+
 ## [1.0.2] - 15th December 2018
 
 * Support for the application icon (thanks to Damodar Lohani)
