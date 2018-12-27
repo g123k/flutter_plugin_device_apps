@@ -56,7 +56,8 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
             case "getInstalledApps":
                 boolean systemApps = call.hasArgument("system_apps") && (Boolean) (call.argument("system_apps"));
                 boolean includeAppIcons = call.hasArgument("include_app_icons") && (Boolean) (call.argument("include_app_icons"));
-                fetchInstalledApps(systemApps, includeAppIcons, result);
+                boolean onlyAppsWithLaunchIntent = call.hasArgument("only_apps_with_launch_intent") && (Boolean) (call.argument("only_apps_with_launch_intent"));
+                fetchInstalledApps(systemApps, includeAppIcons, onlyAppsWithLaunchIntent, result);
                 break;
             case "getApp":
                 if (!call.hasArgument("package_name") || TextUtils.isEmpty(call.argument("package_name").toString())) {
@@ -87,23 +88,26 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
         }
     }
 
-    private void fetchInstalledApps(final boolean includeSystemApps, final boolean includeAppIcons, final Result result) {
+    private void fetchInstalledApps(final boolean includeSystemApps, final boolean includeAppIcons, final boolean onlyAppsWithLaunchIntent, final Result result) {
         asyncWork.run(new Runnable() {
 
             @Override
             public void run() {
-                result.success(getInstalledApps(includeSystemApps, includeAppIcons));
+                result.success(getInstalledApps(includeSystemApps, includeAppIcons, onlyAppsWithLaunchIntent));
             }
         });
     }
 
-    private List<Map<String, Object>> getInstalledApps(boolean includeSystemApps, boolean includeAppIcons) {
+    private List<Map<String, Object>> getInstalledApps(boolean includeSystemApps, boolean includeAppIcons, boolean onlyAppsWithLaunchIntent) {
         PackageManager packageManager = context.getPackageManager();
         List<PackageInfo> apps = packageManager.getInstalledPackages(0);
         List<Map<String, Object>> installedApps = new ArrayList<>(apps.size());
 
         for (PackageInfo pInfo : apps) {
             if (!includeSystemApps && isSystemApp(pInfo)) {
+                continue;
+            }
+            if (onlyAppsWithLaunchIntent && packageManager.getLaunchIntentForPackage(pInfo.packageName) == null) {
                 continue;
             }
 
