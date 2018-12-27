@@ -1,3 +1,7 @@
+## [1.0.4] - 27th December 2018
+
+* Ability to filter only launchable apps (thanks to Damodar Lohani)
+
 ## [1.0.3] - 17th December 2018
 
 * Some asserts added + a different class is used when an icon is passed

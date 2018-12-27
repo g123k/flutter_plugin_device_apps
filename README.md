@@ -21,10 +21,10 @@ You can filter system apps if necessary.
 Note: The list of apps is not ordered!
 
 ### Get apps with launch intent
-You can now get only those apps with launch intent by using the following option. Also add includeSystemApps option to get all the apps that have launch intent.
+You can now get only those apps with launch intent by using the following option. Also add `includeSystemApps` option to get all the apps that have launch intent.
 
 ```dart
-//returns a list of only those apps that have launch intent
+// Returns a list of only those apps that have launch intent
 List<Application> apps = await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeSystemApps: true)
 ```
 

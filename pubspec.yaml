@@ -1,6 +1,6 @@
 name: device_apps
 description: Plugin to get the list of applications installed on the device (Android only)
-version: 1.0.3
+version: 1.0.4
 author: Edouard Marquez <moi@edouard-marquez.me>
 homepage: https://github.com/g123k/flutter_plugin_device_apps
 
