@@ -1,3 +1,7 @@
+## [1.0.5] - 21th January 2019
+
+* Some tests apps does not have a _version_name_. From now on, the plugin will just ignore them.
+
 ## [1.0.4] - 27th December 2018
 
 * Ability to filter only launchable apps (thanks to Damodar Lohani)
