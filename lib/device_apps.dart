@@ -8,17 +8,27 @@ class DeviceApps {
       const MethodChannel('g123k/device_apps');
 
   static Future<List<Application>> getInstalledApplications(
-      {bool includeSystemApps: false, bool includeAppIcons: false, bool onlyAppsWithLaunchIntent: false}) async {
+      {bool includeSystemApps: false,
+      bool includeAppIcons: false,
+      bool onlyAppsWithLaunchIntent: false}) async {
     return _channel.invokeMethod('getInstalledApps', {
       'system_apps': includeSystemApps,
       'include_app_icons': includeAppIcons,
-      'only_apps_with_launch_intent':onlyAppsWithLaunchIntent
+      'only_apps_with_launch_intent': onlyAppsWithLaunchIntent
     }).then((apps) {
       if (apps != null && apps is List) {
         List<Application> list = new List();
         for (var app in apps) {
           if (app is Map) {
-            list.add(Application(app));
+            try {
+              list.add(Application(app));
+            } catch (e) {
+              if (e is AssertionError) {
+                print('[DeviceApps] Unable to add the following app: $app');
+              } else {
+                print('[DeviceApps] $e');
+              }
+            }
           }
         }
 
