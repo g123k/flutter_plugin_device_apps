@@ -156,6 +156,7 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
         map.put("package_name", pInfo.packageName);
         map.put("version_code", pInfo.versionCode);
         map.put("version_name", pInfo.versionName);
+        map.put("data_dir", pInfo.applicationInfo.dataDir);
         map.put("system_app", isSystemApp(pInfo));
 
         if (includeAppIcon) {

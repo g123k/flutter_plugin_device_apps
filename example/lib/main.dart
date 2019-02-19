@@ -82,7 +82,7 @@ class _ListAppsPagesContent extends StatelessWidget {
                           onTap: () => DeviceApps.openApp(app.packageName),
                           title: Text("${app.appName} (${app.packageName})"),
                           subtitle: Text(
-                              "Version : ${app.versionName}\nSystem app: ${app.systemApp}")),
+                              "Version: ${app.versionName}\nSystem app: ${app.systemApp}\nData dir : ${app.dataDir}")),
                       Divider(
                         height: 1.0,
                       )
