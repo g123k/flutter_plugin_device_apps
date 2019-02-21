@@ -1,3 +1,7 @@
+## [1.0.6] - 21th February 2019
+
+* For each application, you have now access to the "data directory" path (thanks to Ryan Gonzalez)
+
 ## [1.0.5] - 21th January 2019
 
 * Some tests apps does not have a _version_name_. From now on, the plugin will just ignore them.
