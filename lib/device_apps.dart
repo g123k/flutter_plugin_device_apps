@@ -82,6 +82,7 @@ class Application {
   final String appName;
   final String packageName;
   final String versionName;
+  final String dataDir;
   final bool systemApp;
 
   factory Application(Map map) {
@@ -100,10 +101,12 @@ class Application {
       : assert(map['app_name'] != null),
         assert(map['package_name'] != null),
         assert(map['version_name'] != null),
+        assert(map['data_dir'] != null),
         assert(map['system_app'] != null),
         appName = map['app_name'],
         packageName = map['package_name'],
         versionName = map['version_name'],
+        dataDir = map['data_dir'],
         systemApp = map['system_app'];
 
   @override
