@@ -82,6 +82,7 @@ class Application {
   final String appName;
   final String packageName;
   final String versionName;
+  final int versionCode;
   final String dataDir;
   final bool systemApp;
 
@@ -101,17 +102,19 @@ class Application {
       : assert(map['app_name'] != null),
         assert(map['package_name'] != null),
         assert(map['version_name'] != null),
+        assert(map['version_code'] != null),
         assert(map['data_dir'] != null),
         assert(map['system_app'] != null),
         appName = map['app_name'],
         packageName = map['package_name'],
         versionName = map['version_name'],
+        versionCode = map['version_code'],
         dataDir = map['data_dir'],
         systemApp = map['system_app'];
 
   @override
   String toString() {
-    return 'App name: $appName, Package name: $packageName, Version name: $versionName';
+    return 'App name: $appName, Package name: $packageName, Version name: $versionName, Version code: $versionCode';
   }
 }
 
