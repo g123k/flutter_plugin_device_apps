@@ -1,10 +1,14 @@
+## [1.0.7] - 3rd April 2019
+
+* The version code is now available in the Dart code
+
 ## [1.0.6] - 21th February 2019
 
 * For each application, you have now access to the "data directory" path (thanks to Ryan Gonzalez)
 
 ## [1.0.5] - 21th January 2019
 
-* Some tests apps does not have a _version_name_. From now on, the plugin will just ignore them.
+* Some tests apps does not have a _version_name_. From now on, the plugin will just ignore them
 
 ## [1.0.4] - 27th December 2018
 
@@ -21,8 +25,8 @@
 
 ## [1.0.1] - 30th October 2018
 
-* New attribute to detect whether the app is user or system.
+* New attribute to detect whether the app is user or system
 
 ## [1.0.0] - 6th June 2018
 
-* Initial release (support for Android only).
+* Initial release (support for Android only)
