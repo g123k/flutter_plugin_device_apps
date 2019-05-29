@@ -1,5 +1,6 @@
 package fr.g123k.deviceapps;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -35,29 +36,41 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
      */
     public static void registerWith(Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "g123k/device_apps");
-        DeviceAppsPlugin plugin = new DeviceAppsPlugin(registrar.activeContext());
+        DeviceAppsPlugin plugin = new DeviceAppsPlugin(registrar.activity());
         registrar.addViewDestroyListener(plugin);
         channel.setMethodCallHandler(plugin);
     }
 
     private final int SYSTEM_APP_MASK = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
 
-    private final Context context;
+    private final Activity activity;
     private final AsyncWork asyncWork;
 
-    private DeviceAppsPlugin(Context context) {
-        this.context = context;
+    private DeviceAppsPlugin(Activity activity) {
+        this.activity = activity;
         this.asyncWork = new AsyncWork();
     }
 
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
+    public void onMethodCall(MethodCall call, final Result result) {
         switch (call.method) {
             case "getInstalledApps":
                 boolean systemApps = call.hasArgument("system_apps") && (Boolean) (call.argument("system_apps"));
                 boolean includeAppIcons = call.hasArgument("include_app_icons") && (Boolean) (call.argument("include_app_icons"));
                 boolean onlyAppsWithLaunchIntent = call.hasArgument("only_apps_with_launch_intent") && (Boolean) (call.argument("only_apps_with_launch_intent"));
-                fetchInstalledApps(systemApps, includeAppIcons, onlyAppsWithLaunchIntent, result);
+                fetchInstalledApps(systemApps, includeAppIcons, onlyAppsWithLaunchIntent, new InstalledAppsCallback() {
+                    @Override
+                    public void onInstalledAppsListAvailable(final List<Map<String, Object>> apps) {
+                        if (!activity.isFinishing()) {
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    result.success(apps);
+                                }
+                            });
+                        }
+                    }
+                });
                 break;
             case "getApp":
                 if (!call.hasArgument("package_name") || TextUtils.isEmpty(call.argument("package_name").toString())) {
@@ -88,18 +101,23 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
         }
     }
 
-    private void fetchInstalledApps(final boolean includeSystemApps, final boolean includeAppIcons, final boolean onlyAppsWithLaunchIntent, final Result result) {
+    private void fetchInstalledApps(final boolean includeSystemApps, final boolean includeAppIcons, final boolean onlyAppsWithLaunchIntent, final InstalledAppsCallback callback) {
         asyncWork.run(new Runnable() {
 
             @Override
             public void run() {
-                result.success(getInstalledApps(includeSystemApps, includeAppIcons, onlyAppsWithLaunchIntent));
+                List<Map<String, Object>> installedApps = getInstalledApps(includeSystemApps, includeAppIcons, onlyAppsWithLaunchIntent);
+
+                if (callback != null) {
+                    callback.onInstalledAppsListAvailable(installedApps);
+                }
             }
+
         });
     }
 
     private List<Map<String, Object>> getInstalledApps(boolean includeSystemApps, boolean includeAppIcons, boolean onlyAppsWithLaunchIntent) {
-        PackageManager packageManager = context.getPackageManager();
+        PackageManager packageManager = activity.getPackageManager();
         List<PackageInfo> apps = packageManager.getInstalledPackages(0);
         List<Map<String, Object>> installedApps = new ArrayList<>(apps.size());
 
@@ -119,10 +137,10 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
     }
 
     private boolean openApp(String packageName) {
-        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        Intent launchIntent = activity.getPackageManager().getLaunchIntentForPackage(packageName);
         if (launchIntent != null) {
             // null pointer check in case package name was not found
-            context.startActivity(launchIntent);
+            activity.startActivity(launchIntent);
             return true;
         }
         return false;
@@ -134,7 +152,7 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
 
     private boolean isAppInstalled(String packageName) {
         try {
-            context.getPackageManager().getPackageInfo(packageName, 0);
+            activity.getPackageManager().getPackageInfo(packageName, 0);
             return true;
         } catch (PackageManager.NameNotFoundException ignored) {
             return false;
@@ -143,7 +161,7 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
 
     private Map<String, Object> getApp(String packageName, boolean includeAppIcon) {
         try {
-            PackageManager packageManager = context.getPackageManager();
+            PackageManager packageManager = activity.getPackageManager();
             return getAppData(packageManager, packageManager.getPackageInfo(packageName, 0), includeAppIcon);
         } catch (PackageManager.NameNotFoundException ignored) {
             return null;
