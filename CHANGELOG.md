@@ -1,3 +1,7 @@
+## [1.0.8] - 29th May 2019
+
+* Fix issue #11 (>= Flutter 1.6)
+
 ## [1.0.7] - 3rd April 2019
 
 * The version code is now available in the Dart code
