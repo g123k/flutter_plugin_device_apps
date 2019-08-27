@@ -80,6 +80,7 @@ class DeviceApps {
 
 class Application {
   final String appName;
+  final String apkFilePath;
   final String packageName;
   final String versionName;
   final int versionCode;
@@ -100,12 +101,14 @@ class Application {
 
   Application._fromMap(Map map)
       : assert(map['app_name'] != null),
+        assert(map['apk_file_path'] != null),
         assert(map['package_name'] != null),
         assert(map['version_name'] != null),
         assert(map['version_code'] != null),
         assert(map['data_dir'] != null),
         assert(map['system_app'] != null),
         appName = map['app_name'],
+        apkFilePath = map['apk_file_path'],
         packageName = map['package_name'],
         versionName = map['version_name'],
         versionCode = map['version_code'],
