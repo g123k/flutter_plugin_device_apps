@@ -34,11 +34,11 @@ class DeviceApps {
 
         return list;
       } else {
-        return List(0);
+        return List<Application>(0);
       }
     }).catchError((err) {
       print(err);
-      return List(0);
+      return List<Application>(0);
     });
   }
 
