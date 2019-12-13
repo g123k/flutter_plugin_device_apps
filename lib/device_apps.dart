@@ -33,10 +33,12 @@ class DeviceApps {
         }
 
         return list;
+      } else {
+        return List(0);
       }
     }).catchError((err) {
       print(err);
-      return new List(0);
+      return List(0);
     });
   }
 
@@ -52,6 +54,8 @@ class DeviceApps {
     }).then((app) {
       if (app != null && app is Map) {
         return Application(app);
+      } else {
+        return null;
       }
     }).catchError((err) {
       print(err);
