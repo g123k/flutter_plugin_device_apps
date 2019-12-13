@@ -24,7 +24,8 @@ class _ListAppsPagesState extends State<ListAppsPages> {
                 PopupMenuItem<String>(
                     value: 'system_apps', child: Text('Toggle system apps')),
                 PopupMenuItem<String>(
-                  value: "launchable_apps", child: Text('Toggle launchable apps only'),
+                  value: "launchable_apps",
+                  child: Text('Toggle launchable apps only'),
                 )
               ];
             },
@@ -34,7 +35,7 @@ class _ListAppsPagesState extends State<ListAppsPages> {
                   _showSystemApps = !_showSystemApps;
                 });
               }
-              if(key == "launchable_apps"){
+              if (key == "launchable_apps") {
                 setState(() {
                   _onlyLaunchableApps = !_onlyLaunchableApps;
                 });
@@ -44,7 +45,9 @@ class _ListAppsPagesState extends State<ListAppsPages> {
         ],
       ),
       body: _ListAppsPagesContent(
-          includeSystemApps: _showSystemApps, onlyAppsWithLaunchIntent: _onlyLaunchableApps, key: GlobalKey()),
+          includeSystemApps: _showSystemApps,
+          onlyAppsWithLaunchIntent: _onlyLaunchableApps,
+          key: GlobalKey()),
     );
   }
 }
@@ -53,14 +56,19 @@ class _ListAppsPagesContent extends StatelessWidget {
   final bool includeSystemApps;
   final bool onlyAppsWithLaunchIntent;
 
-  const _ListAppsPagesContent({Key key, this.includeSystemApps: false, this.onlyAppsWithLaunchIntent: false})
+  const _ListAppsPagesContent(
+      {Key key,
+      this.includeSystemApps: false,
+      this.onlyAppsWithLaunchIntent: false})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: DeviceApps.getInstalledApplications(
-            includeAppIcons: true, includeSystemApps: includeSystemApps, onlyAppsWithLaunchIntent: onlyAppsWithLaunchIntent),
+            includeAppIcons: true,
+            includeSystemApps: includeSystemApps,
+            onlyAppsWithLaunchIntent: onlyAppsWithLaunchIntent),
         builder: (context, data) {
           if (data.data == null) {
             return Center(child: CircularProgressIndicator());
@@ -73,16 +81,22 @@ class _ListAppsPagesContent extends StatelessWidget {
                   return Column(
                     children: <Widget>[
                       ListTile(
-                          leading: app is ApplicationWithIcon
-                              ? CircleAvatar(
-                                  backgroundImage: MemoryImage(app.icon),
-                                  backgroundColor: Colors.white,
-                                )
-                              : null,
-                          onTap: () => DeviceApps.openApp(app.packageName),
-                          title: Text("${app.appName} (${app.packageName})"),
-                          subtitle: Text(
-                              "Version: ${app.versionName}\nSystem app: ${app.systemApp}\nData dir : ${app.dataDir}")),
+                        leading: app is ApplicationWithIcon
+                            ? CircleAvatar(
+                                backgroundImage: MemoryImage(app.icon),
+                                backgroundColor: Colors.white,
+                              )
+                            : null,
+                        onTap: () => DeviceApps.openApp(app.packageName),
+                        title: Text("${app.appName} (${app.packageName})"),
+                        subtitle: Text('''
+Version: ${app.versionName}
+System app: ${app.systemApp}
+Data dir : ${app.dataDir}
+Installed: ${DateTime.fromMillisecondsSinceEpoch(app.installTimeMilis).toString()}
+Updated: ${DateTime.fromMillisecondsSinceEpoch(app.updateTimeMilis).toString()}
+'''),
+                      ),
                       Divider(
                         height: 1.0,
                       )
