@@ -86,6 +86,8 @@ class Application {
   final int versionCode;
   final String dataDir;
   final bool systemApp;
+  final int installTimeMilis;
+  final int updateTimeMilis;
 
   factory Application(Map map) {
     if (map == null || map.length == 0) {
@@ -107,13 +109,17 @@ class Application {
         assert(map['version_code'] != null),
         assert(map['data_dir'] != null),
         assert(map['system_app'] != null),
+        assert(map['install_time'] != null),
+        assert(map['update_time'] != null),
         appName = map['app_name'],
         apkFilePath = map['apk_file_path'],
         packageName = map['package_name'],
         versionName = map['version_name'],
         versionCode = map['version_code'],
         dataDir = map['data_dir'],
-        systemApp = map['system_app'];
+        systemApp = map['system_app'],
+        installTimeMilis = map['install_time'],
+        updateTimeMilis = map['update_time'];
 
   @override
   String toString() {
