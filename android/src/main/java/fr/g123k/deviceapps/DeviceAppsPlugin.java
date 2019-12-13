@@ -96,6 +96,7 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
                     String packageName = call.argument("package_name").toString();
                     result.success(openApp(packageName));
                 }
+                break;
             default:
                 result.notImplemented();
         }
