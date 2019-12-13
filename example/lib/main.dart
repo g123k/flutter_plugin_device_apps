@@ -89,13 +89,7 @@ class _ListAppsPagesContent extends StatelessWidget {
                             : null,
                         onTap: () => DeviceApps.openApp(app.packageName),
                         title: Text("${app.appName} (${app.packageName})"),
-                        subtitle: Text('''
-Version: ${app.versionName}
-System app: ${app.systemApp}
-Data dir : ${app.dataDir}
-Installed: ${DateTime.fromMillisecondsSinceEpoch(app.installTimeMilis).toString()}
-Updated: ${DateTime.fromMillisecondsSinceEpoch(app.updateTimeMilis).toString()}
-'''),
+                        subtitle: Text('Version: ${app.versionName}\nSystem app: ${app.systemApp}\nAPK file path: ${app.apkFilePath}\nData dir : ${app.dataDir}\nInstalled: ${DateTime.fromMillisecondsSinceEpoch(app.installTimeMilis).toString()}\nUpdated: ${DateTime.fromMillisecondsSinceEpoch(app.updateTimeMilis).toString()}'),
                       ),
                       Divider(
                         height: 1.0,
