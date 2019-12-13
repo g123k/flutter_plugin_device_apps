@@ -1,6 +1,8 @@
 # Flutter Device apps plugin
 
-Plugin to get the list of installed applications (iOS is not supported yet).
+[![Pub](https://img.shields.io/pub/v/device_apps.svg)](https://pub.dartlang.org/packages/device_apps)
+
+A plugin to get the list of installed applications (iOS is not supported yet).
 
 ## Getting Started
 
