@@ -180,6 +180,7 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
         map.put("system_app", isSystemApp(pInfo));
         map.put("install_time", pInfo.firstInstallTime);
         map.put("update_time", pInfo.lastUpdateTime);
+        map.put("category", pInfo.applicationInfo.category);
 
         if (includeAppIcon) {
             try {
