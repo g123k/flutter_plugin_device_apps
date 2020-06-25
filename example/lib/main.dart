@@ -71,7 +71,7 @@ class _ListAppsPagesContent extends StatelessWidget {
             onlyAppsWithLaunchIntent: onlyAppsWithLaunchIntent),
         builder: (context, data) {
           if (data.data == null) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else {
             List<Application> apps = data.data;
             print(apps);
@@ -89,7 +89,12 @@ class _ListAppsPagesContent extends StatelessWidget {
                             : null,
                         onTap: () => DeviceApps.openApp(app.packageName),
                         title: Text("${app.appName} (${app.packageName})"),
-                        subtitle: Text('Version: ${app.versionName}\nSystem app: ${app.systemApp}\nAPK file path: ${app.apkFilePath}\nData dir : ${app.dataDir}\nInstalled: ${DateTime.fromMillisecondsSinceEpoch(app.installTimeMilis).toString()}\nUpdated: ${DateTime.fromMillisecondsSinceEpoch(app.updateTimeMilis).toString()}'),
+                        subtitle: Text('Version: ${app.versionName}\n'
+                            'System app: ${app.systemApp}\n'
+                            'APK file path: ${app.apkFilePath}\n'
+                            'Data dir: ${app.dataDir}\n'
+                            'Installed: ${DateTime.fromMillisecondsSinceEpoch(app.installTimeMillis).toString()}\n'
+                            'Updated: ${DateTime.fromMillisecondsSinceEpoch(app.updateTimeMillis).toString()}'),
                       ),
                       Divider(
                         height: 1.0,

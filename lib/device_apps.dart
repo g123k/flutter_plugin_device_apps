@@ -90,8 +90,8 @@ class Application {
   final int versionCode;
   final String dataDir;
   final bool systemApp;
-  final int installTimeMilis;
-  final int updateTimeMilis;
+  final int installTimeMillis;
+  final int updateTimeMillis;
   final int category;
 
   factory Application(Map map) {
@@ -123,8 +123,8 @@ class Application {
         versionCode = map['version_code'],
         dataDir = map['data_dir'],
         systemApp = map['system_app'],
-        installTimeMilis = map['install_time'],
-        updateTimeMilis = map['update_time'],
+        installTimeMillis = map['install_time'],
+        updateTimeMillis = map['update_time'],
         category = map['category'];
 
   @override
