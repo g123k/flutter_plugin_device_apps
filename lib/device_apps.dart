@@ -143,3 +143,42 @@ class ApplicationWithIcon extends Application {
 
   get icon => base64.decode(_icon);
 }
+
+
+/// A App change receiver that creates a stream of app package name
+///
+///
+/// Usage:
+///
+/// ```dart
+/// var receiver = AppChangeReceiver();
+/// receiver.onAppChangeReceived.listen((String packageName) => ...);
+/// ```
+class AppChangeReceiver {
+  static AppChangeReceiver _instance;
+  final EventChannel _channel;
+  Stream<String> _onAppChangeReceived;
+
+  factory AppChangeReceiver() {
+    if (_instance == null) {
+      final EventChannel eventChannel = const EventChannel(
+          "g123k/device_apps/changeAppEvent", const JSONMethodCodec());
+      _instance = new AppChangeReceiver._private(eventChannel);
+    }
+    return _instance;
+  }
+
+  AppChangeReceiver._private(this._channel);
+
+  /// Create a stream that collect received SMS
+  Stream<String> get onAppChangeReceived {
+    if (_onAppChangeReceived == null) {
+      print("Creating app receiver");
+      _onAppChangeReceived = _channel.receiveBroadcastStream().map((dynamic event) {
+        String msg = "App changed";
+        return msg;
+      });
+    }
+    return _onAppChangeReceived;
+  }
+}
