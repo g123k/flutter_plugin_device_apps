@@ -92,7 +92,7 @@ class Application {
   final bool systemApp;
   final int installTimeMillis;
   final int updateTimeMillis;
-  final int category;
+  final ApplicationCategory category;
 
   factory Application(Map map) {
     if (map == null || map.length == 0) {
@@ -125,12 +125,47 @@ class Application {
         systemApp = map['system_app'],
         installTimeMillis = map['install_time'],
         updateTimeMillis = map['update_time'],
-        category = map['category'];
+        category = _parseCategory(map['category']);
+
+  /// [https://developer.android.com/reference/kotlin/android/content/pm/ApplicationInfo]
+  static ApplicationCategory _parseCategory(Object category) {
+    if (category == null || (category is num && category < 0)) {
+      return ApplicationCategory.undefined;
+    } else if (category == 0) {
+      return ApplicationCategory.game;
+    } else if (category == 1) {
+      return ApplicationCategory.audio;
+    } else if (category == 2) {
+      return ApplicationCategory.video;
+    } else if (category == 3) {
+      return ApplicationCategory.image;
+    } else if (category == 4) {
+      return ApplicationCategory.social;
+    } else if (category == 5) {
+      return ApplicationCategory.news;
+    } else if (category == 6) {
+      return ApplicationCategory.maps;
+    } else if (category == 7) {
+      return ApplicationCategory.game;
+    }
+  }
 
   @override
   String toString() {
-    return 'App name: $appName, Package name: $packageName, Version name: $versionName, Version code: $versionCode';
+    return 'Application{appName: $appName, apkFilePath: $apkFilePath, packageName: $packageName, versionName: $versionName, versionCode: $versionCode, dataDir: $dataDir, systemApp: $systemApp, installTimeMillis: $installTimeMillis, updateTimeMillis: $updateTimeMillis, category: $category}';
   }
+}
+
+enum ApplicationCategory {
+  audio,
+  game,
+  image,
+  maps,
+  news,
+  productivity,
+  social,
+  video,
+  undefined
 }
 
 class ApplicationWithIcon extends Application {
