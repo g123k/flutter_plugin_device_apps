@@ -1,3 +1,9 @@
+## [1.0.10] - 25th June 2020
+
+* Fix typo installTimeMilis -> installTimeMillis
+* Fix typo updateTimeMilis -> updateTimeMillis
+* Support for the app category (PR #37)
+
 ## [1.0.9] - 13th December 2019
 
 * Add path to APK file (PR #16)
