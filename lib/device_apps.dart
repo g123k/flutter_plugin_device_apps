@@ -92,6 +92,7 @@ class Application {
   final bool systemApp;
   final int installTimeMilis;
   final int updateTimeMilis;
+  final int category;
 
   factory Application(Map map) {
     if (map == null || map.length == 0) {
@@ -123,7 +124,8 @@ class Application {
         dataDir = map['data_dir'],
         systemApp = map['system_app'],
         installTimeMilis = map['install_time'],
-        updateTimeMilis = map['update_time'];
+        updateTimeMilis = map['update_time'],
+        category = map['category'];
 
   @override
   String toString() {
