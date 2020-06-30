@@ -54,6 +54,13 @@ To open an application
 DeviceApps.openApp('com.frandroid.app');
 ```
 
+## Open an application info screen
+
+To open an application info screen
+```dart
+DeviceApps.openAppInfoScreen('com.frandroid.app');
+```
+
 ## Displaying app icon
 
 When calling the `getInstalledApplications()` or `getApp()` methods, you can ask for the icon.

@@ -80,6 +80,14 @@ class DeviceApps {
     return await _channel
         .invokeMethod('openApp', {'package_name': packageName});
   }
+
+  static Future<bool> openAppInfoScreen(String packageName) async {
+    if (packageName.isEmpty) {
+      throw Exception('The package name can not be empty');
+    }
+    return await _channel
+        .invokeMethod('openAppInfoScreen', {'package_name': packageName});
+  }
 }
 
 class Application {

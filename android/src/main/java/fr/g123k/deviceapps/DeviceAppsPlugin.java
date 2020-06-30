@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.net.Uri;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -97,6 +98,14 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
                     result.success(openApp(packageName));
                 }
                 break;
+            case "openAppInfoScreen":
+                if (!call.hasArgument("package_name") || TextUtils.isEmpty(call.argument("package_name").toString())) {
+                    result.error("ERROR", "Empty or null package name", null);
+                } else {
+                    String packageName = call.argument("package_name").toString();
+                    result.success(openAppInfoScreen(packageName));
+                }
+                break;
             default:
                 result.notImplemented();
         }
@@ -139,6 +148,17 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
 
     private boolean openApp(String packageName) {
         Intent launchIntent = activity.getPackageManager().getLaunchIntentForPackage(packageName);
+        if (launchIntent != null) {
+            // null pointer check in case package name was not found
+            activity.startActivity(launchIntent);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean openAppInfoScreen(String packageName) {
+        Intent launchIntent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        launchIntent.setData(Uri.parse("package:" + packageName));
         if (launchIntent != null) {
             // null pointer check in case package name was not found
             activity.startActivity(launchIntent);
