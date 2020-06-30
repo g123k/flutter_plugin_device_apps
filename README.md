@@ -61,6 +61,17 @@ To open an application info screen
 DeviceApps.openAppInfoScreen('com.frandroid.app');
 ```
 
+## Uninstall an application
+Android P+ requires this permission in AndroidManifest.xml
+```xml
+<uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+```
+
+To uninstall an application
+```dart
+DeviceApps.uninstallApp('com.frandroid.app');
+```
+
 ## Displaying app icon
 
 When calling the `getInstalledApplications()` or `getApp()` methods, you can ask for the icon.

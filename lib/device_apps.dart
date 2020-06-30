@@ -88,6 +88,14 @@ class DeviceApps {
     return await _channel
         .invokeMethod('openAppInfoScreen', {'package_name': packageName});
   }
+
+  static Future<bool> uninstallApp(String packageName) async {
+    if (packageName.isEmpty) {
+      throw Exception('The package name can not be empty');
+    }
+    return await _channel
+        .invokeMethod('uninstallApp', {'package_name': packageName});
+  }
 }
 
 class Application {

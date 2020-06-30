@@ -106,6 +106,14 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
                     result.success(openAppInfoScreen(packageName));
                 }
                 break;
+            case "uninstallApp":
+                if (!call.hasArgument("package_name") || TextUtils.isEmpty(call.argument("package_name").toString())) {
+                    result.error("ERROR", "Empty or null package name", null);
+                } else {
+                    String packageName = call.argument("package_name").toString();
+                    result.success(uninstallApp(packageName));
+                }
+                break;
             default:
                 result.notImplemented();
         }
@@ -158,6 +166,17 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
 
     private boolean openAppInfoScreen(String packageName) {
         Intent launchIntent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        launchIntent.setData(Uri.parse("package:" + packageName));
+        if (launchIntent != null) {
+            // null pointer check in case package name was not found
+            activity.startActivity(launchIntent);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean uninstallApp(String packageName) {
+        Intent launchIntent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
         launchIntent.setData(Uri.parse("package:" + packageName));
         if (launchIntent != null) {
             // null pointer check in case package name was not found
