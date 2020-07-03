@@ -162,7 +162,7 @@ class Application {
     } else if (category == 6) {
       return ApplicationCategory.maps;
     } else if (category == 7) {
-      return ApplicationCategory.game;
+      return ApplicationCategory.productivity;
     }
   }
 
