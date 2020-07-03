@@ -63,6 +63,14 @@ To display the image, just call:
 Image.memory(app.icon);
 ```
 
+## Listen to app changes
 
+If you want to be notified for app changes like app installs or uninstalls you must subscribe to an instance of the `AppChangeReceiver` class:
 
-
+```dart
+AppChangeReceiver receiver = new AppChangeReceiver();
+receiver.onAppChangeReceived.listen((AppChange _appChange) {
+    print(_appChange.action);
+    print(_appChange.packageName);
+});
+```
