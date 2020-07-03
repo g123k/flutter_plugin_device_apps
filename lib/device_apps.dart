@@ -195,14 +195,14 @@ class ApplicationWithIcon extends Application {
   get icon => base64.decode(_icon);
 }
 
-/// A App change receiver that creates a stream of app package name
+/// A App change receiver that creates a stream of app changes
 ///
 ///
 /// Usage:
 ///
 /// ```dart
 /// var receiver = AppChangeReceiver();
-/// receiver.onAppChangeReceived.listen((String packageName) => ...);
+/// receiver.onAppChangeReceived.listen((AppChange appChange) => ...);
 /// ```
 class AppChangeReceiver {
   static AppChangeReceiver _instance;
