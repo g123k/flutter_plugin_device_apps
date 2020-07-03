@@ -82,6 +82,7 @@ class DeviceApps {
   }
 
   static Future<bool> openAppInfoScreen(String packageName) async {
+    assert(packageName != null);
     if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
     }
@@ -90,6 +91,7 @@ class DeviceApps {
   }
 
   static Future<bool> uninstallApp(String packageName) async {
+    assert(packageName != null);
     if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
     }
