@@ -194,3 +194,77 @@ class ApplicationWithIcon extends Application {
 
   get icon => base64.decode(_icon);
 }
+
+/// A App change receiver that creates a stream of app package name
+///
+///
+/// Usage:
+///
+/// ```dart
+/// var receiver = AppChangeReceiver();
+/// receiver.onAppChangeReceived.listen((String packageName) => ...);
+/// ```
+class AppChangeReceiver {
+  static AppChangeReceiver _instance;
+  final EventChannel _channel;
+  Stream<AppChange> _onAppChangeReceived;
+
+  factory AppChangeReceiver() {
+    if (_instance == null) {
+      final EventChannel eventChannel = const EventChannel(
+          "g123k/device_apps/changeAppEvent", const JSONMethodCodec());
+      _instance = new AppChangeReceiver._private(eventChannel);
+    }
+    return _instance;
+  }
+
+  AppChangeReceiver._private(this._channel);
+
+  /// Create a stream that collect received Apps
+  Stream<AppChange> get onAppChangeReceived {
+    if (_onAppChangeReceived == null) {
+      _onAppChangeReceived =
+          _channel.receiveBroadcastStream().map((dynamic event) {
+            if (event != null && event is Map) {
+              return AppChange(event);
+            }
+          });
+    }
+    return _onAppChangeReceived;
+  }
+}
+
+class AppChange {
+  final String packageName;
+  final AppChangeAction action;
+
+  factory AppChange(Map map) {
+    if (map == null || map.length == 0) {
+      throw Exception('The map can not be null!');
+    }
+    return AppChange._fromMap(map);
+  }
+
+  AppChange._fromMap(Map map)
+      : assert(map['package_name'] != null),
+        packageName = map['package_name'],
+        action = _parseAction(map['action']);
+
+  static AppChangeAction _parseAction(dynamic action) {
+    if (action == "android.intent.action.PACKAGE_ADDED")
+      return AppChangeAction.PACKAGE_ADDED;
+    else if (action == "android.intent.action.PACKAGE_REMOVED")
+      return AppChangeAction.PACKAGE_REMOVED;
+    else if (action == "android.intent.action.PACKAGE_REPLACED")
+      return AppChangeAction.PACKAGE_REPLACED;
+    else
+      return AppChangeAction.UNKNOWN;
+  }
+}
+
+enum AppChangeAction {
+  PACKAGE_ADDED,
+  PACKAGE_REMOVED,
+  PACKAGE_REPLACED,
+  UNKNOWN
+}

@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.EventChannel;
+import io.flutter.plugin.common.JSONMethodCodec;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
@@ -37,6 +39,13 @@ public class DeviceAppsPlugin implements MethodCallHandler, PluginRegistry.ViewD
      */
     public static void registerWith(Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "g123k/device_apps");
+
+        // App change receiver
+        final AppChangeReceiver receiver = new AppChangeReceiver(registrar);
+        final EventChannel receiveAppChangeChannel = new EventChannel(registrar.messenger(),
+                "g123k/device_apps/changeAppEvent", JSONMethodCodec.INSTANCE);
+        receiveAppChangeChannel.setStreamHandler(receiver);
+
         DeviceAppsPlugin plugin = new DeviceAppsPlugin(registrar.activity());
         registrar.addViewDestroyListener(plugin);
         channel.setMethodCallHandler(plugin);
