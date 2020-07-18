@@ -147,6 +147,8 @@ class Application {
       return ApplicationCategory.maps;
     } else if (category == 7) {
       return ApplicationCategory.game;
+    } else {
+      return ApplicationCategory.undefined;
     }
   }
 
@@ -156,6 +158,7 @@ class Application {
   }
 }
 
+// Only supported with Android 26+
 enum ApplicationCategory {
   audio,
   game,

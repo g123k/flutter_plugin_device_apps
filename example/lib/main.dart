@@ -75,34 +75,36 @@ class _ListAppsPagesContent extends StatelessWidget {
           } else {
             List<Application> apps = data.data;
             print(apps);
-            return ListView.builder(
-                itemBuilder: (context, position) {
-                  Application app = apps[position];
-                  return Column(
-                    children: <Widget>[
-                      ListTile(
-                        leading: app is ApplicationWithIcon
-                            ? CircleAvatar(
-                                backgroundImage: MemoryImage(app.icon),
-                                backgroundColor: Colors.white,
-                              )
-                            : null,
-                        onTap: () => DeviceApps.openApp(app.packageName),
-                        title: Text("${app.appName} (${app.packageName})"),
-                        subtitle: Text('Version: ${app.versionName}\n'
-                            'System app: ${app.systemApp}\n'
-                            'APK file path: ${app.apkFilePath}\n'
-                            'Data dir: ${app.dataDir}\n'
-                            'Installed: ${DateTime.fromMillisecondsSinceEpoch(app.installTimeMillis).toString()}\n'
-                            'Updated: ${DateTime.fromMillisecondsSinceEpoch(app.updateTimeMillis).toString()}'),
-                      ),
-                      Divider(
-                        height: 1.0,
-                      )
-                    ],
-                  );
-                },
-                itemCount: apps.length);
+            return Scrollbar(
+              child: ListView.builder(
+                  itemBuilder: (context, position) {
+                    Application app = apps[position];
+                    return Column(
+                      children: <Widget>[
+                        ListTile(
+                          leading: app is ApplicationWithIcon
+                              ? CircleAvatar(
+                                  backgroundImage: MemoryImage(app.icon),
+                                  backgroundColor: Colors.white,
+                                )
+                              : null,
+                          onTap: () => DeviceApps.openApp(app.packageName),
+                          title: Text("${app.appName} (${app.packageName})"),
+                          subtitle: Text('Version: ${app.versionName}\n'
+                              'System app: ${app.systemApp}\n'
+                              'APK file path: ${app.apkFilePath}\n'
+                              'Data dir: ${app.dataDir}\n'
+                              'Installed: ${DateTime.fromMillisecondsSinceEpoch(app.installTimeMillis).toString()}\n'
+                              'Updated: ${DateTime.fromMillisecondsSinceEpoch(app.updateTimeMillis).toString()}'),
+                        ),
+                        Divider(
+                          height: 1.0,
+                        )
+                      ],
+                    );
+                  },
+                  itemCount: apps.length),
+            );
           }
         });
   }

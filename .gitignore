@@ -9,3 +9,4 @@ build/
 
 *.iml
 /.idea/
+.flutter-plugins-dependencies
