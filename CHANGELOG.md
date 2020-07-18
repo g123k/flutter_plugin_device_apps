@@ -1,3 +1,9 @@
+## [1.1.0] - 18th July 2020
+
+* Migration to the Plugin V2 embedding system
+* Fix a crash on devices with an API level lower than 26
+* Fix a NPE crash when the plugin was called in the background
+
 ## [1.0.10] - 25th June 2020
 
 * Fix typo installTimeMilis -> installTimeMillis
