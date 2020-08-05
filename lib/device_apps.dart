@@ -44,11 +44,11 @@ class DeviceApps {
 
         return list;
       } else {
-        return List<Application>.empty();
+        return List<Application>(0);
       }
     }).catchError((Object err) {
       print(err);
-      return List<Application>.empty();
+      return List<Application>(0);
     });
   }
 
