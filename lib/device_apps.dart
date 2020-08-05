@@ -3,10 +3,20 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+/// Plugin to list the applications installed on an Android device
+/// iOS is not supported
 class DeviceApps {
   static const MethodChannel _channel =
       const MethodChannel('g123k/device_apps');
 
+  /// List installed applications on the device
+  /// [includeSystemApps] will also include system apps (or pre-installed) like
+  /// Phone, Settings...
+  /// [includeAppIcons] will also include the icon for each app (be aware that
+  /// this feature is memory-heaving, since it will load all icons).
+  /// To get the icon you have to cast the object to [ApplicationWithIcon]
+  /// [onlyAppsWithLaunchIntent] will only list applications when an entrypoint.
+  /// It is similar to what a launcher will display
   static Future<List<Application>> getInstalledApplications(
       {bool includeSystemApps: false,
       bool includeAppIcons: false,
@@ -34,14 +44,17 @@ class DeviceApps {
 
         return list;
       } else {
-        return List<Application>(0);
+        return List<Application>.empty();
       }
     }).catchError((err) {
       print(err);
-      return List<Application>(0);
+      return List<Application>.empty();
     });
   }
 
+  /// Provide all information for a given app by its [packageName]
+  /// [includeAppIcon] will also include the icon for the app.
+  /// To get it, you have to cast the object to [ApplicationWithIcon].
   static Future<Application> getApp(String packageName,
       [bool includeAppIcon = false]) async {
     if (packageName.isEmpty) {
@@ -63,16 +76,21 @@ class DeviceApps {
     });
   }
 
-  static Future<bool> isAppInstalled(String packageName) async {
+  /// Returns whether a given [packageName] is installed on the device
+  /// You will then receive in return a boolean
+  static Future<bool> isAppInstalled(String packageName) {
     if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
     }
 
-    bool isAppInstalled = await _channel
+    return _channel
         .invokeMethod('isAppInstalled', {'package_name': packageName});
-    return isAppInstalled;
   }
 
+  /// Launch an app based on its [packageName]
+  /// You will then receive in return if the app was opened
+  /// (will be false if the app is not installed, or if no "launcher" intent is
+  /// provided by this app)
   static Future<bool> openApp(String packageName) async {
     if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
@@ -92,6 +110,7 @@ class Application {
   final bool systemApp;
   final int installTimeMillis;
   final int updateTimeMillis;
+  // Only available with
   final ApplicationCategory category;
 
   factory Application(Map map) {
