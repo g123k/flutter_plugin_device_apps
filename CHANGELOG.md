@@ -1,3 +1,7 @@
+## [1.1.1] - 05th August 2020
+
+* Fix wrong category (productivity was recognized as a game)
+
 ## [1.1.0] - 18th July 2020
 
 * Migration to the Plugin V2 embedding system
