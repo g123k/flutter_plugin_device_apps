@@ -1,3 +1,7 @@
+## [1.1.1+1] - 05th August 2020
+
+* Remove pub warning
+
 ## [1.1.1] - 05th August 2020
 
 * Fix wrong category (productivity was recognized as a game)
