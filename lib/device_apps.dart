@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
 /// Plugin to list the applications installed on an Android device
 /// iOS is not supported
 class DeviceApps {
-  static const MethodChannel _channel =
-      const MethodChannel('g123k/device_apps');
+  static const MethodChannel _channel = MethodChannel('g123k/device_apps');
 
   /// List installed applications on the device
   /// [includeSystemApps] will also include system apps (or pre-installed) like
@@ -21,14 +21,14 @@ class DeviceApps {
       {bool includeSystemApps: false,
       bool includeAppIcons: false,
       bool onlyAppsWithLaunchIntent: false}) async {
-    return _channel.invokeMethod('getInstalledApps', {
+    return _channel.invokeMethod('getInstalledApps', <String, bool>{
       'system_apps': includeSystemApps,
       'include_app_icons': includeAppIcons,
       'only_apps_with_launch_intent': onlyAppsWithLaunchIntent
-    }).then((apps) {
+    }).then((Object apps) {
       if (apps != null && apps is List) {
-        List<Application> list = new List();
-        for (var app in apps) {
+        List<Application> list = List<Application>();
+        for (Object app in apps) {
           if (app is Map) {
             try {
               list.add(Application(app));
@@ -46,7 +46,7 @@ class DeviceApps {
       } else {
         return List<Application>.empty();
       }
-    }).catchError((err) {
+    }).catchError((Object err) {
       print(err);
       return List<Application>.empty();
     });
@@ -61,16 +61,16 @@ class DeviceApps {
       throw Exception('The package name can not be empty');
     }
 
-    return _channel.invokeMethod('getApp', {
+    return _channel.invokeMethod('getApp', <String, Object>{
       'package_name': packageName,
       'include_app_icon': includeAppIcon
-    }).then((app) {
+    }).then((Object app) {
       if (app != null && app is Map) {
         return Application(app);
       } else {
         return null;
       }
-    }).catchError((err) {
+    }).catchError((Object err) {
       print(err);
       return null;
     });
@@ -83,8 +83,8 @@ class DeviceApps {
       throw Exception('The package name can not be empty');
     }
 
-    return _channel
-        .invokeMethod('isAppInstalled', {'package_name': packageName});
+    return _channel.invokeMethod(
+        'isAppInstalled', <String, String>{'package_name': packageName});
   }
 
   /// Launch an app based on its [packageName]
@@ -96,7 +96,7 @@ class DeviceApps {
       throw Exception('The package name can not be empty');
     }
     return await _channel
-        .invokeMethod('openApp', {'package_name': packageName});
+        .invokeMethod('openApp', <String, String>{'package_name': packageName});
   }
 }
 
@@ -113,7 +113,7 @@ class Application {
   // Only available with
   final ApplicationCategory category;
 
-  factory Application(Map map) {
+  factory Application(Map<String, Object> map) {
     if (map == null || map.length == 0) {
       throw Exception('The map can not be null!');
     }
@@ -125,7 +125,7 @@ class Application {
     }
   }
 
-  Application._fromMap(Map map)
+  Application._fromMap(Map<String, Object> map)
       : assert(map['app_name'] != null),
         assert(map['apk_file_path'] != null),
         assert(map['package_name'] != null),
@@ -193,10 +193,10 @@ enum ApplicationCategory {
 class ApplicationWithIcon extends Application {
   final String _icon;
 
-  ApplicationWithIcon._fromMap(Map map)
+  ApplicationWithIcon._fromMap(Map<String, Object> map)
       : assert(map['app_icon'] != null),
         _icon = map['app_icon'],
         super._fromMap(map);
 
-  get icon => base64.decode(_icon);
+  Uint8List get icon => base64.decode(_icon);
 }

@@ -16,26 +16,26 @@ class _ListAppsPagesState extends State<ListAppsPages> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Installed applications"),
+        title: Text('Installed applications'),
         actions: <Widget>[
-          PopupMenuButton(
-            itemBuilder: (context) {
+          PopupMenuButton<String>(
+            itemBuilder: (BuildContext context) {
               return <PopupMenuItem<String>>[
                 PopupMenuItem<String>(
                     value: 'system_apps', child: Text('Toggle system apps')),
                 PopupMenuItem<String>(
-                  value: "launchable_apps",
+                  value: 'launchable_apps',
                   child: Text('Toggle launchable apps only'),
                 )
               ];
             },
-            onSelected: (key) {
-              if (key == "system_apps") {
+            onSelected: (String key) {
+              if (key == 'system_apps') {
                 setState(() {
                   _showSystemApps = !_showSystemApps;
                 });
               }
-              if (key == "launchable_apps") {
+              if (key == 'launchable_apps') {
                 setState(() {
                   _onlyLaunchableApps = !_onlyLaunchableApps;
                 });
@@ -64,12 +64,12 @@ class _ListAppsPagesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<List<Application>>(
         future: DeviceApps.getInstalledApplications(
             includeAppIcons: true,
             includeSystemApps: includeSystemApps,
             onlyAppsWithLaunchIntent: onlyAppsWithLaunchIntent),
-        builder: (context, data) {
+        builder: (BuildContext context, AsyncSnapshot<List<Application>> data) {
           if (data.data == null) {
             return const Center(child: CircularProgressIndicator());
           } else {
@@ -77,7 +77,7 @@ class _ListAppsPagesContent extends StatelessWidget {
             print(apps);
             return Scrollbar(
               child: ListView.builder(
-                  itemBuilder: (context, position) {
+                  itemBuilder: (BuildContext context, int position) {
                     Application app = apps[position];
                     return Column(
                       children: <Widget>[
@@ -89,7 +89,7 @@ class _ListAppsPagesContent extends StatelessWidget {
                                 )
                               : null,
                           onTap: () => DeviceApps.openApp(app.packageName),
-                          title: Text("${app.appName} (${app.packageName})"),
+                          title: Text('${app.appName} (${app.packageName})'),
                           subtitle: Text('Version: ${app.versionName}\n'
                               'System app: ${app.systemApp}\n'
                               'APK file path: ${app.apkFilePath}\n'
