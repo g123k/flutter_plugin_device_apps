@@ -31,7 +31,7 @@ class DeviceApps {
         for (Object app in apps) {
           if (app is Map) {
             try {
-              list.add(Application(app));
+              list.add(Application(Map.castFrom<dynamic, dynamic, String, Object>(app)));
             } catch (e) {
               if (e is AssertionError) {
                 print('[DeviceApps] Unable to add the following app: $app');
@@ -66,7 +66,7 @@ class DeviceApps {
       'include_app_icon': includeAppIcon
     }).then((Object app) {
       if (app != null && app is Map) {
-        return Application(app);
+        return Application(Map.castFrom<dynamic, dynamic, String, Object>(app));
       } else {
         return null;
       }
@@ -110,6 +110,7 @@ class Application {
   final bool systemApp;
   final int installTimeMillis;
   final int updateTimeMillis;
+
   // Only available with
   final ApplicationCategory category;
 
