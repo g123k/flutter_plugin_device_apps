@@ -113,7 +113,7 @@ class Application {
   // Only available with
   final ApplicationCategory category;
 
-  factory Application(Map<String, Object> map) {
+  factory Application(Map<Object, Object> map) {
     if (map == null || map.length == 0) {
       throw Exception('The map can not be null!');
     }
@@ -125,7 +125,7 @@ class Application {
     }
   }
 
-  Application._fromMap(Map<String, Object> map)
+  Application._fromMap(Map<Object, Object> map)
       : assert(map['app_name'] != null),
         assert(map['apk_file_path'] != null),
         assert(map['package_name'] != null),
@@ -173,7 +173,17 @@ class Application {
 
   @override
   String toString() {
-    return 'Application{appName: $appName, apkFilePath: $apkFilePath, packageName: $packageName, versionName: $versionName, versionCode: $versionCode, dataDir: $dataDir, systemApp: $systemApp, installTimeMillis: $installTimeMillis, updateTimeMillis: $updateTimeMillis, category: $category}';
+    return 'Application{'
+        'appName: $appName, '
+        'apkFilePath: $apkFilePath, '
+        'packageName: $packageName, '
+        'versionName: $versionName, '
+        'versionCode: $versionCode, '
+        'dataDir: $dataDir, '
+        'systemApp: $systemApp, '
+        'installTimeMillis: $installTimeMillis, '
+        'updateTimeMillis: $updateTimeMillis, '
+        'category: $category}';
   }
 }
 
@@ -193,7 +203,7 @@ enum ApplicationCategory {
 class ApplicationWithIcon extends Application {
   final String _icon;
 
-  ApplicationWithIcon._fromMap(Map<String, Object> map)
+  ApplicationWithIcon._fromMap(Map<Object, Object> map)
       : assert(map['app_icon'] != null),
         _icon = map['app_icon'],
         super._fromMap(map);
