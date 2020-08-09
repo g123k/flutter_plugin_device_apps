@@ -1,3 +1,9 @@
+## [1.2.0] - 09th August 2020
+
+* Support for Android 11. 
+
+Please read the README file.
+
 ## [1.1.2] - 09th August 2020
 
 * Fix issue #49

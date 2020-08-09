@@ -1,6 +1,6 @@
 name: device_apps
-description: Plugin to list the applications installed on an Android device (iOS is not supported)
-version: 1.1.2
+description: Plugin to list applications installed on an Android device (iOS is not supported)
+version: 1.2.0
 homepage: https://github.com/g123k/flutter_plugin_device_apps
 
 dependencies:
