@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
-/// Plugin to list the applications installed on an Android device
+/// Plugin to list applications installed on an Android device
 /// iOS is not supported
 class DeviceApps {
   static const MethodChannel _channel = MethodChannel('g123k/device_apps');
@@ -31,7 +31,7 @@ class DeviceApps {
         for (Object app in apps) {
           if (app is Map) {
             try {
-              list.add(Application(app));
+              list.add(Application._(app));
             } catch (e) {
               if (e is AssertionError) {
                 print('[DeviceApps] Unable to add the following app: $app');
@@ -66,7 +66,7 @@ class DeviceApps {
       'include_app_icon': includeAppIcon
     }).then((Object app) {
       if (app != null && app is Map) {
-        return Application(app);
+        return Application._(app);
       } else {
         return null;
       }
@@ -100,20 +100,45 @@ class DeviceApps {
   }
 }
 
+/// An application installed on the device
+/// Depending on the Android version, some attributes may not be available
 class Application {
+  /// Displayable name of the application
   final String appName;
+
+  /// Full path to the base APK for this application
   final String apkFilePath;
+
+  /// Name of the package
   final String packageName;
+
+  /// Public name of the application (eg: 1.0.0)
+  /// The version name of this package, as specified by the <manifest> tag's
+  /// `versionName` attribute
   final String versionName;
+
+  /// Unique version id for the application
   final int versionCode;
+
+  /// Full path to the default directory assigned to the package for its
+  /// persistent data
   final String dataDir;
+
+  /// Whether the application is installed in the device's system image
+  /// An application downloaded by the user won't be a system app
   final bool systemApp;
+
+  /// The time at which the app was first installed
   final int installTimeMillis;
+
+  /// The time at which the app was last updated
   final int updateTimeMillis;
-  // Only available with
+
+  /// The category of this application
+  /// The information may come from the application itself or the system
   final ApplicationCategory category;
 
-  factory Application(Map<Object, Object> map) {
+  factory Application._(Map<Object, Object> map) {
     if (map == null || map.length == 0) {
       throw Exception('The map can not be null!');
     }
@@ -146,7 +171,9 @@ class Application {
         updateTimeMillis = map['update_time'],
         category = _parseCategory(map['category']);
 
+  /// Mapping of Android categories
   /// [https://developer.android.com/reference/kotlin/android/content/pm/ApplicationInfo]
+  /// [category] is null on Android < 26
   static ApplicationCategory _parseCategory(Object category) {
     if (category == null || (category is num && category < 0)) {
       return ApplicationCategory.undefined;
@@ -187,19 +214,50 @@ class Application {
   }
 }
 
-// Only supported with Android 26+
+/// A category provided by the system (Only supported with Android 26+)
+/// [https://developer.android.com/reference/kotlin/android/content/pm/ApplicationInfo]
 enum ApplicationCategory {
+  /// Category for apps which primarily work with audio or music, such as
+  /// music players.
   audio,
+
+  /// Category for apps which are primarily games.
   game,
+
+  /// Category for apps which primarily work with images or photos, such as
+  /// camera or gallery apps.
   image,
+
+  /// Category for apps which are primarily maps apps, such as navigation apps.
   maps,
+
+  /// Category for apps which are primarily news apps, such as newspapers,
+  /// magazines, or sports apps.
   news,
+
+  /// Category for apps which are primarily productivity apps, such as cloud
+  /// storage or workplace apps.
   productivity,
+
+  /// Category for apps which are primarily social apps, such as messaging,
+  /// communication, email, or social network apps.
   social,
+
+  /// Category for apps which primarily work with video or movies, such as
+  /// streaming video apps.
   video,
+
+  /// Value when category is undefined.
   undefined
 }
 
+/// If the [includeAppIcons] attribute is provided, this class will be used.
+/// To display an image simply use the [Image.memory] widget.
+/// Example:
+///
+/// ```
+/// Image.memory(app.icon)
+/// ```
 class ApplicationWithIcon extends Application {
   final String _icon;
 
@@ -208,5 +266,6 @@ class ApplicationWithIcon extends Application {
         _icon = map['app_icon'],
         super._fromMap(map);
 
+  /// Icon of the application to use in conjunction with [Image.memory]
   Uint8List get icon => base64.decode(_icon);
 }
