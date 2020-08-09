@@ -1,3 +1,7 @@
+## [1.1.2] - 09th August 2020
+
+* Fix issue #49
+
 ## [1.1.1+1] - 05th August 2020
 
 * Remove pub warning
