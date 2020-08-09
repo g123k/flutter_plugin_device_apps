@@ -64,7 +64,7 @@ public class DeviceAppsPlugin implements
 
     @Override
     @SuppressWarnings("ConstantConditions")
-    public void onMethodCall(MethodCall call, final Result result) {
+    public void onMethodCall(MethodCall call, @NonNull final Result result) {
         switch (call.method) {
             case "getInstalledApps":
                 boolean systemApps = call.hasArgument("system_apps") && (Boolean) (call.argument("system_apps"));
