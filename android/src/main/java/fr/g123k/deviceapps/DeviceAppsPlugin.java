@@ -43,7 +43,7 @@ import static fr.g123k.deviceapps.utils.DrawableUtils.getBitmapFromDrawable;
  */
 public class DeviceAppsPlugin implements
         FlutterPlugin,
-        MethodCallHandler {
+        MethodCallHandler,ActivityAware {
 
     private final int SYSTEM_APP_MASK = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
 
@@ -52,6 +52,32 @@ public class DeviceAppsPlugin implements
     public DeviceAppsPlugin() {
         this.asyncWork = new AsyncWork();
     }
+                
+                
+      @Override
+  public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
+    // TODO: your plugin is now attached to an Activity
+  }
+
+  @Override
+  public void onDetachedFromActivityForConfigChanges() {
+    // TODO: the Activity your plugin was attached to was
+    // destroyed to change configuration.
+    // This call will be followed by onReattachedToActivityForConfigChanges().
+  }
+
+  @Override
+  public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
+    // TODO: your plugin is now attached to a new Activity
+    // after a configuration change.
+  }
+
+  @Override
+  public void onDetachedFromActivity() {
+    // TODO: your plugin is no longer associated with an Activity.
+    // Clean up references.
+  }            
+                
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
