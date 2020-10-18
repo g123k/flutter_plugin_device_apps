@@ -20,7 +20,6 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     compileSdkVersion 30
@@ -33,6 +32,4 @@ android {
         disable 'InvalidPackage'
     }
 }
-flutter {
-    source '..'
-}
+
