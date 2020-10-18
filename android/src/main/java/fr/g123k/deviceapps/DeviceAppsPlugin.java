@@ -53,11 +53,13 @@ public class DeviceAppsPlugin implements
         this.asyncWork = new AsyncWork();
     }
                 
+    public static void registerWith(final Registrar registrar) {
+        final MethodChannel channel = new MethodChannel(registrar.messenger(),"g123k/device_apps");
+        channel.setMethodCallHandler(new DeviceAppsPlugin(channel, registrar.activeContext()));
+    }
                 
-      @Override
-  public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
-    // TODO: your plugin is now attached to an Activity
-  }
+                
+
 
   @Override
   public void onDetachedFromActivityForConfigChanges() {
@@ -70,20 +72,12 @@ public class DeviceAppsPlugin implements
   public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
     // TODO: your plugin is now attached to a new Activity
     // after a configuration change.
-  }
-
-  @Override
-  public void onDetachedFromActivity() {
-    // TODO: your plugin is no longer associated with an Activity.
-    // Clean up references.
-  }            
+  }           
                 
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
-        final MethodChannel channel = new MethodChannel(binding.getBinaryMessenger(), "g123k/device_apps");
-        context = binding.getApplicationContext();
-        channel.setMethodCallHandler(this);
+        
     }
 
     private Context context;
