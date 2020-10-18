@@ -67,13 +67,7 @@ public class DeviceAppsPlugin implements
         channel.setMethodCallHandler(new DeviceAppsPlugin(channel, registrar.activeContext()));
     }
                 
-            
-
-  @Override
-  public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
-    // TODO: your plugin is now attached to a new Activity
-    // after a configuration change.
-  }           
+                    
                 
 
     @Override
