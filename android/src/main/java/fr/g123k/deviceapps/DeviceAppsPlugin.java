@@ -49,6 +49,8 @@ public class DeviceAppsPlugin implements
 
     private final AsyncWork asyncWork;
     private Context context;
+    private MethodChannel channel;
+
 
     public DeviceAppsPlugin() {
         this.asyncWork = new AsyncWork();
@@ -59,15 +61,7 @@ public class DeviceAppsPlugin implements
         channel.setMethodCallHandler(new DeviceAppsPlugin(channel, registrar.activeContext()));
     }
                 
-                
-
-
-  @Override
-  public void onDetachedFromActivityForConfigChanges() {
-    // TODO: the Activity your plugin was attached to was
-    // destroyed to change configuration.
-    // This call will be followed by onReattachedToActivityForConfigChanges().
-  }
+            
 
   @Override
   public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
