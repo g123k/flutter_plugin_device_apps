@@ -43,11 +43,12 @@ import static fr.g123k.deviceapps.utils.DrawableUtils.getBitmapFromDrawable;
  */
 public class DeviceAppsPlugin implements
         FlutterPlugin,
-        MethodCallHandler,ActivityAware {
+        MethodCallHandler {
 
     private final int SYSTEM_APP_MASK = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
 
     private final AsyncWork asyncWork;
+    private Context context;
 
     public DeviceAppsPlugin() {
         this.asyncWork = new AsyncWork();
@@ -77,10 +78,14 @@ public class DeviceAppsPlugin implements
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "g123k/device_apps");
+     channel.setMethodCallHandler(this);
+     context = flutterPluginBinding.getApplicationContext();
         
     }
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {}
 
-    private Context context;
 
     @Override
     @SuppressWarnings("ConstantConditions")
