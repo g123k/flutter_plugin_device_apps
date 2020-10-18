@@ -60,6 +60,7 @@ public class DeviceAppsPlugin implements
         this.channel = channel;
         this.channel.setMethodCallHandler(this);
         this.context = context;
+        this.asyncWork = new AsyncWork();
     }
                 
     public static void registerWith(final Registrar registrar) {
