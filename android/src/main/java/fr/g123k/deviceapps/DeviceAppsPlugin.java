@@ -55,6 +55,12 @@ public class DeviceAppsPlugin implements
     public DeviceAppsPlugin() {
         this.asyncWork = new AsyncWork();
     }
+            
+    private DeviceAppsPlugin(final MethodChannel channel, Context context) {
+        this.channel = channel;
+        this.channel.setMethodCallHandler(this);
+        this.context = context;
+    }
                 
     public static void registerWith(final Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(),"g123k/device_apps");
@@ -71,14 +77,12 @@ public class DeviceAppsPlugin implements
                 
 
     @Override
-    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
      channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "g123k/device_apps");
      channel.setMethodCallHandler(this);
      context = flutterPluginBinding.getApplicationContext();
         
     }
-    @Override
-    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {}
 
 
     @Override
