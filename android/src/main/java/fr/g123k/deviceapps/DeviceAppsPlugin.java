@@ -88,9 +88,33 @@ public class DeviceAppsPlugin implements
                 } else {
                     String packageName = call.argument("package_name").toString();
                     boolean includeAppIcon = call.hasArgument("include_app_icon") && (Boolean) (call.argument("include_app_icon"));
+
                     result.success(getApp(packageName, includeAppIcon));
                 }
                 break;
+
+            case "getAppByApkFiles":
+                // boolean includeAppIcons = call.hasArgument("include_app_icons") && (Boolean) (call.argument("include_app_icons"));
+                if (!call.hasArgument("paths")) {
+                    result.error("ERROR", "Empty or invalid argument", null);
+                } else {
+                    List<String> apkFilePaths = call.argument("paths");
+                    boolean includeAppIcon = call.hasArgument("include_app_icon") && (Boolean) (call.argument("include_app_icon"));
+                    // result.success(getAppByApkFile(apkFilePaths, includeAppIcon));
+                    fetchApkIconsByFile(apkFilePaths, includeAppIcon, new InstalledAppsCallback() {
+                    @Override
+                    public void onInstalledAppsListAvailable(final List<Map<String, Object>> apps) {
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                result.success(apps);
+                            }
+                        });
+                    }
+                });
+                }
+            break;
+
             case "isAppInstalled":
                 if (!call.hasArgument("package_name") || TextUtils.isEmpty(call.argument("package_name").toString())) {
                     result.error("ERROR", "Empty or null package name", null);
@@ -127,6 +151,25 @@ public class DeviceAppsPlugin implements
         });
     }
 
+    //thread for getting apkIcons 
+
+    private void fetchApkIconsByFile(final List<String> listOfPathsOfApkFiles, final boolean includeAppIcons, final InstalledAppsCallback callback) {
+        asyncWork.run(new Runnable() {
+
+            @Override
+            public void run() {
+                List<Map<String, Object>> installedApps = getAppByApkFile(listOfPathsOfApkFiles, includeAppIcons);
+
+                if (callback != null) {
+                    callback.onInstalledAppsListAvailable(installedApps);
+                }
+            }
+
+        });
+    }
+
+    
+
     private List<Map<String, Object>> getInstalledApps(boolean includeSystemApps, boolean includeAppIcons, boolean onlyAppsWithLaunchIntent) {
         PackageManager packageManager = context.getPackageManager();
         List<PackageInfo> apps = packageManager.getInstalledPackages(0);
@@ -136,6 +179,7 @@ public class DeviceAppsPlugin implements
             if (!includeSystemApps && isSystemApp(pInfo)) {
                 continue;
             }
+
             if (onlyAppsWithLaunchIntent && packageManager.getLaunchIntentForPackage(pInfo.packageName) == null) {
                 continue;
             }
@@ -149,13 +193,11 @@ public class DeviceAppsPlugin implements
 
     private boolean openApp(@NonNull String packageName) {
         Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-
         // Null pointer check in case package name was not found
         if (launchIntent != null) {
             context.startActivity(launchIntent);
             return true;
         }
-
         return false;
     }
 
@@ -181,6 +223,27 @@ public class DeviceAppsPlugin implements
         }
     }
 
+
+    // I am doing my stuff here...
+    // i want to get apkInfo from an apk file..
+    private List<Map<String, Object>> getAppByApkFile(List<String> listOfPathsOfApkFiles,boolean includeAppIcon) {
+        PackageManager packageManager = context.getPackageManager();
+        List<Map<String, Object>> apkFiles = new ArrayList<>(listOfPathsOfApkFiles.size());
+        
+            for(String file : listOfPathsOfApkFiles) {
+                PackageInfo pi = packageManager.getPackageArchiveInfo(file, 0);
+                
+                if(pi != null) {
+                    pi.applicationInfo.sourceDir = file;
+                    pi.applicationInfo.publicSourceDir = file;
+                    Map<String, Object> map = getAppData(packageManager, pi, includeAppIcon);
+                    apkFiles.add(map);
+                }
+            }
+        
+        return apkFiles;
+    }
+
     private Map<String, Object> getAppData(PackageManager packageManager, PackageInfo pInfo, boolean includeAppIcon) {
         Map<String, Object> map = new HashMap<>();
         map.put("app_name", pInfo.applicationInfo.loadLabel(packageManager).toString());
@@ -198,12 +261,9 @@ public class DeviceAppsPlugin implements
         }
 
         if (includeAppIcon) {
-            try {
-                Drawable icon = packageManager.getApplicationIcon(pInfo.packageName);
+                Drawable icon = pInfo.applicationInfo.loadIcon(packageManager);
                 String encodedImage = encodeToBase64(getBitmapFromDrawable(icon), Bitmap.CompressFormat.PNG, 100);
                 map.put("app_icon", encodedImage);
-            } catch (PackageManager.NameNotFoundException ignored) {
-            }
         }
 
         return map;
