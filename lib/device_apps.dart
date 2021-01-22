@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:device_apps/app_utils.dart';
 import 'package:flutter/services.dart';
 
 /// Plugin to list applications installed on an Android device
