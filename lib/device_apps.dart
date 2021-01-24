@@ -17,39 +17,23 @@ class DeviceApps {
   /// To get the icon you have to cast the object to [ApplicationWithIcon]
   /// [onlyAppsWithLaunchIntent] will only list applications when an entrypoint.
   /// It is similar to what a launcher will display
+  //
+
   static Future<List<Application>> getInstalledApplications(
       {bool includeSystemApps: false,
       bool includeAppIcons: false,
       bool onlyAppsWithLaunchIntent: false}) async {
-    return _channel.invokeMethod('getInstalledApps', <String, bool>{
-      'system_apps': includeSystemApps,
-      'include_app_icons': includeAppIcons,
-      'only_apps_with_launch_intent': onlyAppsWithLaunchIntent
-    }).then((Object apps) {
-      if (apps != null && apps is List) {
-        List<Application> list = List<Application>();
-        for (Object app in apps) {
-          if (app is Map) {
-            try {
-              list.add(Application._(app));
-            } catch (e) {
-              if (e is AssertionError) {
-                print('[DeviceApps] Unable to add the following app: $app');
-              } else {
-                print('[DeviceApps] $e');
-              }
-            }
-          }
-        }
-
-        return list;
-      } else {
-        return List<Application>(0);
-      }
-    }).catchError((Object err) {
-      print(err);
-      return List<Application>(0);
-    });
+    try {
+      final List data =
+          await _channel.invokeMethod('getInstalledApps', <String, bool>{
+        'system_apps': includeSystemApps,
+        'include_app_icons': includeAppIcons,
+        'only_apps_with_launch_intent': onlyAppsWithLaunchIntent
+      });
+      return data;
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 
   /// Provide all information for a given app by its [packageName]
@@ -97,6 +81,17 @@ class DeviceApps {
     }
     return await _channel
         .invokeMethod('openApp', <String, String>{'package_name': packageName});
+  }
+
+  // This return List<Map<String, dynamic>> you have a util class in this package called App which converts this List<Map> to List<App> you just need to do
+  // App.fromList(List list);
+  // that's it.
+  // here we are not doing this because if you want to parse this into a diffrent isolate you can do that.
+  // this is the benefit of not doing it here.
+  static Future<List> getAppByApkFile(List<String> list) async {
+    final List data = await _channel.invokeMethod(
+        'getAppByApkFiles', <String, List<String>>{'paths': list});
+    return data;
   }
 }
 
