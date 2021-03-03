@@ -52,6 +52,10 @@ class DeviceApps {
     });
   }
 
+  static Application mockApplications(Map<Object, Object> appEntry) {
+    return Application._(appEntry);
+  }
+
   /// Provide all information for a given app by its [packageName]
   /// [includeAppIcon] will also include the icon for the app.
   /// To get it, you have to cast the object to [ApplicationWithIcon].
