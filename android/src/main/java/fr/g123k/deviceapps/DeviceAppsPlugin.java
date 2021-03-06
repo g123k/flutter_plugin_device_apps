@@ -1,39 +1,33 @@
 package fr.g123k.deviceapps;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Base64;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.g123k.deviceapps.utils.IntentUtils;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
-import io.flutter.embedding.engine.plugins.activity.ActivityAware;
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.view.FlutterNativeView;
 
 import static fr.g123k.deviceapps.utils.Base64Utils.encodeToBase64;
 import static fr.g123k.deviceapps.utils.DrawableUtils.getBitmapFromDrawable;
@@ -46,6 +40,7 @@ public class DeviceAppsPlugin implements
         MethodCallHandler {
 
     private final int SYSTEM_APP_MASK = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
+    private static final String LOG_TAG = "DEVICE_APPS";
 
     private final AsyncWork asyncWork;
 
@@ -107,6 +102,14 @@ public class DeviceAppsPlugin implements
                     result.success(openApp(packageName));
                 }
                 break;
+            case "openAppSettings":
+                if (!call.hasArgument("package_name") || TextUtils.isEmpty(call.argument("package_name").toString())) {
+                    result.error("ERROR", "Empty or null package name", null);
+                } else {
+                    String packageName = call.argument("package_name").toString();
+                    result.success(openAppSettings(packageName));
+                }
+                break;
             default:
                 result.notImplemented();
         }
@@ -148,11 +151,33 @@ public class DeviceAppsPlugin implements
     }
 
     private boolean openApp(@NonNull String packageName) {
+        if (!isAppInstalled(packageName)) {
+            Log.w(LOG_TAG, "Application with package name \"" + packageName + "\" is not installed on this device");
+            return false;
+        }
+
         Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
 
-        // Null pointer check in case package name was not found
-        if (launchIntent != null) {
+        if (IntentUtils.isIntentOpenable(launchIntent, context)) {
             context.startActivity(launchIntent);
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean openAppSettings(@NonNull String packageName) {
+        if (!isAppInstalled(packageName)) {
+            Log.w(LOG_TAG, "Application with package name \"" + packageName + "\" is not installed on this device");
+            return false;
+        }
+
+        Intent appSettingsIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        appSettingsIntent.setData(Uri.parse("package:" + packageName));
+        appSettingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        if (IntentUtils.isIntentOpenable(appSettingsIntent, context)) {
+            context.startActivity(appSettingsIntent);
             return true;
         }
 

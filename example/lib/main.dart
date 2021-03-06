@@ -65,47 +65,88 @@ class _ListAppsPagesContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Application>>(
-        future: DeviceApps.getInstalledApplications(
-            includeAppIcons: true,
-            includeSystemApps: includeSystemApps,
-            onlyAppsWithLaunchIntent: onlyAppsWithLaunchIntent),
-        builder: (BuildContext context, AsyncSnapshot<List<Application>> data) {
-          if (data.data == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            List<Application> apps = data.data;
-            print(apps);
-            return Scrollbar(
-              child: ListView.builder(
-                  itemBuilder: (BuildContext context, int position) {
-                    Application app = apps[position];
-                    return Column(
-                      children: <Widget>[
-                        ListTile(
-                          leading: app is ApplicationWithIcon
-                              ? CircleAvatar(
-                                  backgroundImage: MemoryImage(app.icon),
-                                  backgroundColor: Colors.white,
-                                )
-                              : null,
-                          onTap: () => DeviceApps.openApp(app.packageName),
-                          title: Text('${app.appName} (${app.packageName})'),
-                          subtitle: Text('Version: ${app.versionName}\n'
-                              'System app: ${app.systemApp}\n'
-                              'APK file path: ${app.apkFilePath}\n'
-                              'Data dir: ${app.dataDir}\n'
-                              'Installed: ${DateTime.fromMillisecondsSinceEpoch(app.installTimeMillis).toString()}\n'
-                              'Updated: ${DateTime.fromMillisecondsSinceEpoch(app.updateTimeMillis).toString()}'),
-                        ),
-                        Divider(
-                          height: 1.0,
-                        )
-                      ],
-                    );
-                  },
-                  itemCount: apps.length),
-            );
-          }
+      future: DeviceApps.getInstalledApplications(
+          includeAppIcons: true,
+          includeSystemApps: includeSystemApps,
+          onlyAppsWithLaunchIntent: onlyAppsWithLaunchIntent),
+      builder: (BuildContext context, AsyncSnapshot<List<Application>> data) {
+        if (data.data == null) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          List<Application> apps = data.data;
+          print(apps);
+          return Scrollbar(
+            child: ListView.builder(
+                itemBuilder: (BuildContext context, int position) {
+                  Application app = apps[position];
+                  return Column(
+                    children: <Widget>[
+                      ListTile(
+                        leading: app is ApplicationWithIcon
+                            ? CircleAvatar(
+                                backgroundImage: MemoryImage(app.icon),
+                                backgroundColor: Colors.white,
+                              )
+                            : null,
+                        onTap: () => onAppClicked(context, app),
+                        title: Text('${app.appName} (${app.packageName})'),
+                        subtitle: Text('Version: ${app.versionName}\n'
+                            'System app: ${app.systemApp}\n'
+                            'APK file path: ${app.apkFilePath}\n'
+                            'Data dir: ${app.dataDir}\n'
+                            'Installed: ${DateTime.fromMillisecondsSinceEpoch(app.installTimeMillis).toString()}\n'
+                            'Updated: ${DateTime.fromMillisecondsSinceEpoch(app.updateTimeMillis).toString()}'),
+                      ),
+                      const Divider(
+                        height: 1.0,
+                      )
+                    ],
+                  );
+                },
+                itemCount: apps.length),
+          );
+        }
+      },
+    );
+  }
+
+  void onAppClicked(BuildContext context, Application app) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(app.appName),
+            actions: <Widget>[
+              _AppButtonAction(
+                label: 'Open app',
+                onPressed: () => app.openApp(),
+              ),
+              _AppButtonAction(
+                label: 'Open app settings',
+                onPressed: () => app.openSettingsScreen(),
+              ),
+            ],
+          );
         });
+  }
+}
+
+class _AppButtonAction extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+
+  _AppButtonAction({@required this.label, @required this.onPressed})
+      : assert(label != null),
+        assert(onPressed != null);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        onPressed();
+        Navigator.of(context).maybePop();
+      },
+      child: Text(label),
+    );
   }
 }

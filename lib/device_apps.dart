@@ -98,6 +98,18 @@ class DeviceApps {
     return await _channel
         .invokeMethod('openApp', <String, String>{'package_name': packageName});
   }
+
+  /// Launch the Settings screen of the app based on its [packageName]
+  /// You will then receive in return if the app was opened
+  /// (will be false if the app is not installed)
+  static Future<bool> openAppSettings(String packageName) async {
+    if (packageName.isEmpty) {
+      throw Exception('The package name can not be empty');
+    }
+
+    return await _channel.invokeMethod(
+        'openAppSettings', <String, String>{'package_name': packageName});
+  }
 }
 
 /// An application installed on the device
@@ -196,6 +208,20 @@ class Application {
     } else {
       return ApplicationCategory.undefined;
     }
+  }
+
+  // Open the app default screen
+  // Will return [true] is the app is installed and the screen visible
+  // Will return [false] otherwise
+  Future<bool> openApp() {
+    return DeviceApps.openApp(packageName);
+  }
+
+  // Open the app settings screen
+  // Will return [true] is the app is installed and the screen visible
+  // Will return [false] otherwise
+  Future<bool> openSettingsScreen() {
+    return DeviceApps.openAppSettings(packageName);
   }
 
   @override
