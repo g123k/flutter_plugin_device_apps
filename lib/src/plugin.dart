@@ -30,14 +30,12 @@ class DeviceApps {
     bool onlyAppsWithLaunchIntent: false,
   }) async {
     try {
-      final Object apps = await _methodChannel.invokeMethod(
-        'getInstalledApps',
-        <String, bool>{
-          'system_apps': includeSystemApps,
-          'include_app_icons': includeAppIcons,
-          'only_apps_with_launch_intent': onlyAppsWithLaunchIntent,
-        },
-      );
+      final Object apps =
+          await _methodChannel.invokeMethod('getInstalledApps', <String, bool>{
+        'system_apps': includeSystemApps,
+        'include_app_icons': includeAppIcons,
+        'only_apps_with_launch_intent': onlyAppsWithLaunchIntent
+      });
       if (apps is Iterable<Object>) {
         List<Application> list = <Application>[];
         for (Object app in apps) {
@@ -75,12 +73,10 @@ class DeviceApps {
     }
     try {
       final Object? app = await _methodChannel.invokeMethod(
-        'getApp',
-        <String, Object>{
-          'package_name': packageName,
-          'include_app_icon': includeAppIcon,
-        },
-      );
+          'getApp', <String, Object>{
+        'package_name': packageName,
+        'include_app_icon': includeAppIcon
+      });
       if (app != null && app is Map<Object, Object>) {
         return Application._(app);
       } else {
@@ -99,11 +95,8 @@ class DeviceApps {
       throw Exception('The package name can not be empty');
     }
     return _methodChannel.invokeMethod(
-      'isAppInstalled',
-      <String, String>{
-        'package_name': packageName,
-      },
-    ) as Future<bool>;
+            'isAppInstalled', <String, String>{'package_name': packageName})
+        as Future<bool>;
   }
 
   /// Launch an app based on its [packageName]
