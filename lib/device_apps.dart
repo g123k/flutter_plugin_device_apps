@@ -27,7 +27,7 @@ class DeviceApps {
       'only_apps_with_launch_intent': onlyAppsWithLaunchIntent
     }).then((Object apps) {
       if (apps != null && apps is List) {
-        List<Application> list = List<Application>();
+        List<Application> list = List<Application>.empty();
         for (Object app in apps) {
           if (app is Map) {
             try {
@@ -44,11 +44,11 @@ class DeviceApps {
 
         return list;
       } else {
-        return List<Application>(0);
+        return List<Application>.empty();
       }
     }).catchError((Object err) {
       print(err);
-      return List<Application>(0);
+      return List<Application>.empty();
     });
   }
 
