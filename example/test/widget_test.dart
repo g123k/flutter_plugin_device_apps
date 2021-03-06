@@ -4,14 +4,14 @@
 // find child widgets in the widget tree, read text, and verify that the values of widget properties
 // are correct.
 
-import 'package:device_apps_example/main.dart';
+import 'package:device_apps_example/apps_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('Verify Platform version', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(ListAppsPages());
+    await tester.pumpWidget(AppsListScreen());
 
     // Verify that platform version is retrieved.
     expect(
