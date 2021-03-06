@@ -131,6 +131,11 @@ public class DeviceAppsPlugin implements
     }
 
     private List<Map<String, Object>> getInstalledApps(boolean includeSystemApps, boolean includeAppIcons, boolean onlyAppsWithLaunchIntent) {
+        if (context == null) {
+            Log.e(LOG_TAG, "Context is null");
+            return new ArrayList(0);
+        }
+
         PackageManager packageManager = context.getPackageManager();
         List<PackageInfo> apps = packageManager.getInstalledPackages(0);
         List<Map<String, Object>> installedApps = new ArrayList<>(apps.size());
