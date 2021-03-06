@@ -1,3 +1,10 @@
+## [1.2.1] - 06th March 2021
+
+* Ability to open the settings screen of an app : `DeviceApps.openAppSettings(packageName)`
+* New methods on the `Application` class : `openApp()` and `openAppSettings()`
+* Fix for issue #61 (crash on some Android 10 devices)
+
+
 ## [1.2.0] - 09th August 2020
 
 * Support for Android 11. 
