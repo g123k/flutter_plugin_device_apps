@@ -3,6 +3,10 @@ description: Plugin to list applications installed on an Android device (iOS is 
 version: 1.3.0
 homepage: https://github.com/g123k/flutter_plugin_device_apps
 
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+  flutter: ">=1.10.0"
+
 dependencies:
   flutter:
     sdk: flutter
@@ -13,7 +17,3 @@ flutter:
       android:
         package: fr.g123k.deviceapps
         pluginClass: DeviceAppsPlugin
-
-environment:
-  sdk: ">=2.0.0 <3.0.0"
-  flutter: ">=1.10.0"

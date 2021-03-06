@@ -29,15 +29,19 @@ class DeviceApps {
     bool includeAppIcons: false,
     bool onlyAppsWithLaunchIntent: false,
   }) async {
-    return _methodChannel.invokeMethod('getInstalledApps', <String, bool>{
-      'system_apps': includeSystemApps,
-      'include_app_icons': includeAppIcons,
-      'only_apps_with_launch_intent': onlyAppsWithLaunchIntent
-    }).then((Object apps) {
-      if (apps != null && apps is List) {
+    try {
+      final Object apps = await _methodChannel.invokeMethod(
+        'getInstalledApps',
+        <String, bool>{
+          'system_apps': includeSystemApps,
+          'include_app_icons': includeAppIcons,
+          'only_apps_with_launch_intent': onlyAppsWithLaunchIntent,
+        },
+      );
+      if (apps is Iterable<Object>) {
         List<Application> list = <Application>[];
         for (Object app in apps) {
-          if (app is Map) {
+          if (app is Map<Object, Object>) {
             try {
               list.add(Application._(app));
             } catch (e) {
@@ -49,41 +53,43 @@ class DeviceApps {
             }
           }
         }
-
         return list;
       } else {
-        return List<Application>.empty();
+        return <Application>[];
       }
-    }).catchError((Object err) {
+    } catch (err) {
       print(err);
-      return List<Application>.empty();
-    });
+      return <Application>[];
+    }
   }
 
   /// Provide all information for a given app by its [packageName]
   /// [includeAppIcon] will also include the icon for the app.
   /// To get it, you have to cast the object to [ApplicationWithIcon].
-  static Future<Application> getApp(
+  static Future<Application?> getApp(
     String packageName, [
     bool includeAppIcon = false,
   ]) async {
     if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
     }
-
-    return _methodChannel.invokeMethod('getApp', <String, Object>{
-      'package_name': packageName,
-      'include_app_icon': includeAppIcon
-    }).then((Object app) {
-      if (app != null && app is Map) {
+    try {
+      final Object? app = await _methodChannel.invokeMethod(
+        'getApp',
+        <String, Object>{
+          'package_name': packageName,
+          'include_app_icon': includeAppIcon,
+        },
+      );
+      if (app != null && app is Map<Object, Object>) {
         return Application._(app);
       } else {
         return null;
       }
-    }).catchError((Object err) {
+    } catch (err) {
       print(err);
       return null;
-    });
+    }
   }
 
   /// Returns whether a given [packageName] is installed on the device
@@ -92,9 +98,12 @@ class DeviceApps {
     if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
     }
-
     return _methodChannel.invokeMethod(
-        'isAppInstalled', <String, String>{'package_name': packageName});
+      'isAppInstalled',
+      <String, String>{
+        'package_name': packageName,
+      },
+    ) as Future<bool>;
   }
 
   /// Launch an app based on its [packageName]
@@ -105,8 +114,12 @@ class DeviceApps {
     if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
     }
-    return await _methodChannel
-        .invokeMethod('openApp', <String, String>{'package_name': packageName});
+    return await (_methodChannel.invokeMethod(
+      'openApp',
+      <String, String>{
+        'package_name': packageName,
+      },
+    ) as FutureOr<bool>);
   }
 
   /// Launch the Settings screen of the app based on its [packageName]
@@ -117,8 +130,12 @@ class DeviceApps {
       throw Exception('The package name can not be empty');
     }
 
-    return await _methodChannel.invokeMethod(
-        'openAppSettings', <String, String>{'package_name': packageName});
+    return await (_methodChannel.invokeMethod(
+      'openAppSettings',
+      <String, String>{
+        'package_name': packageName,
+      },
+    ) as FutureOr<bool>);
   }
 
   /// Listen to app changes: installations, uninstallations, updates, enabled or
@@ -127,9 +144,9 @@ class DeviceApps {
   static Stream<ApplicationEvent> listenToAppsChanges() {
     return _eventChannel
         .receiveBroadcastStream()
-        .map((Object event) => ApplicationEvent._(event))
-        .handleError((Object err) => null)
-        .where((ApplicationEvent event) => event != null);
+        .map(((dynamic event) =>
+            ApplicationEvent._(event as Map<Object, Object>)))
+        .handleError((Object err) => null);
   }
 }
 
@@ -137,10 +154,8 @@ class DeviceApps {
 class _BaseApplication {
   /// Name of the package
   final String packageName;
-
   _BaseApplication._fromMap(Map<Object, Object> map)
-      : assert(map['package_name'] != null),
-        packageName = map['package_name'];
+      : packageName = map['package_name'] as String;
 }
 
 /// An application installed on the device
@@ -180,13 +195,12 @@ class Application extends _BaseApplication {
 
   /// Whether the app is enabled (installed and visible)
   /// or disabled (installed, but not visible)
-  final bool enabled;
+  final bool? enabled;
 
   factory Application._(Map<Object, Object> map) {
-    if (map == null || map.length == 0) {
+    if (map.length == 0) {
       throw Exception('The map can not be null!');
     }
-
     if (map.containsKey('app_icon')) {
       return ApplicationWithIcon._fromMap(map);
     } else {
@@ -195,30 +209,22 @@ class Application extends _BaseApplication {
   }
 
   Application._fromMap(Map<Object, Object> map)
-      : assert(map['app_name'] != null),
-        assert(map['apk_file_path'] != null),
-        assert(map['version_name'] != null),
-        assert(map['version_code'] != null),
-        assert(map['data_dir'] != null),
-        assert(map['system_app'] != null),
-        assert(map['install_time'] != null),
-        assert(map['update_time'] != null),
-        appName = map['app_name'],
-        apkFilePath = map['apk_file_path'],
-        versionName = map['version_name'],
-        versionCode = map['version_code'],
-        dataDir = map['data_dir'],
-        systemApp = map['system_app'],
-        installTimeMillis = map['install_time'],
-        updateTimeMillis = map['update_time'],
-        enabled = map['is_enabled'],
+      : appName = map['app_name'] as String,
+        apkFilePath = map['apk_file_path'] as String,
+        versionName = map['version_name'] as String,
+        versionCode = map['version_code'] as int,
+        dataDir = map['data_dir'] as String,
+        systemApp = map['system_app'] as bool,
+        installTimeMillis = map['install_time'] as int,
+        updateTimeMillis = map['update_time'] as int,
+        enabled = map['is_enabled'] as bool?,
         category = _parseCategory(map['category']),
         super._fromMap(map);
 
   /// Mapping of Android categories
   /// [https://developer.android.com/reference/kotlin/android/content/pm/ApplicationInfo]
   /// [category] is null on Android < 26
-  static ApplicationCategory _parseCategory(Object category) {
+  static ApplicationCategory _parseCategory(Object? category) {
     if (category == null || (category is num && category < 0)) {
       return ApplicationCategory.undefined;
     } else if (category == 0) {
@@ -316,8 +322,7 @@ class ApplicationWithIcon extends Application {
   final String _icon;
 
   ApplicationWithIcon._fromMap(Map<Object, Object> map)
-      : assert(map['app_icon'] != null),
-        _icon = map['app_icon'],
+      : _icon = map['app_icon'] as String,
         super._fromMap(map);
 
   /// Icon of the application to use in conjunction with [Image.memory]
@@ -348,7 +353,7 @@ abstract class ApplicationEvent {
   final DateTime time;
 
   factory ApplicationEvent._(Map<Object, Object> map) {
-    Object eventType = map['event_type'];
+    Object? eventType = map['event_type'];
 
     if (eventType is! String) {
       throw Exception('Event type \"$eventType\" can not be empty!');
