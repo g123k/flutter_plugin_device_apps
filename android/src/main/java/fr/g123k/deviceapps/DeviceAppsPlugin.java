@@ -40,9 +40,11 @@ public class DeviceAppsPlugin implements
         MethodCallHandler {
 
     private final int SYSTEM_APP_MASK = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
+
     private static final String LOG_TAG = "DEVICE_APPS";
 
     private final AsyncWork asyncWork;
+    private MethodChannel channel;
 
     public DeviceAppsPlugin() {
         this.asyncWork = new AsyncWork();
@@ -50,8 +52,9 @@ public class DeviceAppsPlugin implements
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
-        final MethodChannel channel = new MethodChannel(binding.getBinaryMessenger(), "g123k/device_apps");
         context = binding.getApplicationContext();
+
+        channel = new MethodChannel(binding.getBinaryMessenger(), "g123k/device_apps");
         channel.setMethodCallHandler(this);
     }
 
@@ -242,6 +245,12 @@ public class DeviceAppsPlugin implements
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         asyncWork.stop();
+
+        if (channel != null) {
+            channel.setMethodCallHandler(null);
+            channel = null;
+        }
+        
         context = null;
     }
 }
