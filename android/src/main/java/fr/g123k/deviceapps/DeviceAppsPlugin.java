@@ -43,19 +43,37 @@ public class DeviceAppsPlugin implements
     private static final String LOG_TAG = "DEVICE_APPS";
 
     private final AsyncWork asyncWork;
+    private Context context;
+    private MethodChannel channel;
+
 
     public DeviceAppsPlugin() {
         this.asyncWork = new AsyncWork();
     }
+            
+    private DeviceAppsPlugin(final MethodChannel channel, Context context) {
+        this.channel = channel;
+        this.channel.setMethodCallHandler(this);
+        this.context = context;
+        this.asyncWork = new AsyncWork();
+    }
+                
+    public static void registerWith(final Registrar registrar) {
+        final MethodChannel channel = new MethodChannel(registrar.messenger(),"g123k/device_apps");
+        channel.setMethodCallHandler(new DeviceAppsPlugin(channel, registrar.activeContext()));
+    }
+                
+                    
+                
 
     @Override
-    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
-        final MethodChannel channel = new MethodChannel(binding.getBinaryMessenger(), "g123k/device_apps");
-        context = binding.getApplicationContext();
-        channel.setMethodCallHandler(this);
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "g123k/device_apps");
+     channel.setMethodCallHandler(this);
+     context = flutterPluginBinding.getApplicationContext();
+        
     }
 
-    private Context context;
 
     @Override
     @SuppressWarnings("ConstantConditions")
