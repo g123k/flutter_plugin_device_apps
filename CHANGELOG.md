@@ -1,3 +1,9 @@
+# Changelog
+
+## [2.0.0] - 06th March 2021
+
+* Null safety support
+
 ## [1.3.0] - 06th March 2021
 
 * New feature: listen to app changes (installation, uninstallation, updates…)
