@@ -6,7 +6,7 @@ A plugin to list installed applications on an Android device (⚠️ iOS is not 
 
 ## Change with Android 11
 
-Starting with Android 11, Android applications targeting API level 30, willing to list "external" applications have to declare a new "normal" permission in their `AndroidManifest.xml` file called [`QUERY_ALL_PACKAGES`](https://developer.android.com/reference/kotlin/android/Manifest.permission#query_all_packages). A few notes about this: 
+Starting with Android 11, Android applications targeting API level 30, willing to list "external" applications have to declare a new "normal" permission in their `AndroidManifest.xml` file called [`QUERY_ALL_PACKAGES`](https://developer.android.com/reference/kotlin/android/Manifest.permission#query_all_packages). A few notes about this:
 
 - A normal permission doesn't require the user consent
 - Don't worry, this plugin automatically adds the permission for you
@@ -20,6 +20,7 @@ However, publishing applications on the Google Play with this kind of feature **
 ## Getting Started
 
 First, you have to import the package in your dart file with:
+
 ```dart
 import 'package:device_apps/device_apps.dart';
 ```
@@ -37,6 +38,7 @@ You can filter system apps if necessary.
 **Note**: The list of apps is not ordered! You have to do it yourself.
 
 ### Get apps with a launch Intent
+
 A launch Intent means you can launch the application.
 
 To list only the apps with launch intents, simply use the `onlyAppsWithLaunchIntent: true` attribute.
@@ -45,7 +47,6 @@ To list only the apps with launch intents, simply use the `onlyAppsWithLaunchInt
 // Returns a list of only those apps that have launch intent
 List<Application> apps = await DeviceApps.getInstalledApplications(onlyAppsWithLaunchIntent: true, includeSystemApps: true)
 ```
-
 
 ## Get an application
 
@@ -66,6 +67,7 @@ bool isInstalled = await DeviceApps.isAppInstalled('com.frandroid.app');
 ## Open an application
 
 To open an application (with a launch Intent)
+
 ```dart
 DeviceApps.openApp('com.frandroid.app');
 ```
@@ -73,6 +75,7 @@ DeviceApps.openApp('com.frandroid.app');
 ## Open an application settings screen
 
 To open an application settings screen
+
 ```dart
 DeviceApps.openAppSettings('com.frandroid.app');
 ```
