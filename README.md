@@ -2,7 +2,7 @@
 
 [![Pub](https://img.shields.io/pub/v/device_apps.svg)](https://pub.dartlang.org/packages/device_apps)
 
-A plugin to list installed applications on an Android device (⚠️ iOS is not supported).
+A plugin to list installed applications on an Android device (⚠️ iOS is not supported). You can also listen to app changes (eg: installations, updates…)
 
 ## Change with Android 11
 
@@ -70,6 +70,13 @@ To open an application (with a launch Intent)
 DeviceApps.openApp('com.frandroid.app');
 ```
 
+## Open an application settings screen
+
+To open an application settings screen
+```dart
+DeviceApps.openAppSettings('com.frandroid.app');
+```
+
 ## Include application icon
 
 When calling `getInstalledApplications()` or `getApp()` methods, you can also ask for the icon.
@@ -77,4 +84,18 @@ To display the image, just call:
 
 ```dart
 Image.memory(app.icon);
+```
+
+## Listen to app changes
+
+To listen to applications events on the device (installation, uninstallation, update, enabled or disabled):
+
+```dart
+Stream<ApplicationEvent> apps = await DeviceApps.listenToAppsChanges();
+```
+
+If you only need events for a single app, just use the `Stream` API, like so:
+
+```dart
+DeviceApps.listenToAppsChanges().where((ApplicationEvent event) => event.packageName == 'com.frandroid.app')
 ```

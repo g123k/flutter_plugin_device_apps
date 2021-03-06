@@ -42,7 +42,7 @@ class _AppsListScreenState extends State<AppsListScreen> {
           )
         ],
       ),
-      body: _ListAppsPagesContent(
+      body: _AppsListScreenContent(
           includeSystemApps: _showSystemApps,
           onlyAppsWithLaunchIntent: _onlyLaunchableApps,
           key: GlobalKey()),
@@ -50,11 +50,11 @@ class _AppsListScreenState extends State<AppsListScreen> {
   }
 }
 
-class _ListAppsPagesContent extends StatelessWidget {
+class _AppsListScreenContent extends StatelessWidget {
   final bool includeSystemApps;
   final bool onlyAppsWithLaunchIntent;
 
-  const _ListAppsPagesContent(
+  const _AppsListScreenContent(
       {Key key,
       this.includeSystemApps: false,
       this.onlyAppsWithLaunchIntent: false})

@@ -121,6 +121,9 @@ class DeviceApps {
         'openAppSettings', <String, String>{'package_name': packageName});
   }
 
+  /// Listen to app changes: installations, uninstallations, updates, enabled or
+  /// disabled. As it is a [Stream], don't hesite to filter data if the content
+  /// is too verbose for you
   static Stream<ApplicationEvent> listenToAppsChanges() {
     return _eventChannel
         .receiveBroadcastStream()
@@ -130,6 +133,7 @@ class DeviceApps {
   }
 }
 
+/// The Base class to reprend an application (= a package name)
 class _BaseApplication {
   /// Name of the package
   final String packageName;
@@ -331,6 +335,15 @@ class ApplicationWithIcon extends Application {
   int get hashCode => super.hashCode ^ _icon.hashCode;
 }
 
+/// Represent an event relative to an application, which can be:
+/// - installation
+/// - update (from V1 to V2)
+/// - uninstallation
+/// - (re)enabled by the user
+/// - disabled by the user (not visible, but still installed)
+///
+/// Note: an [Application] is not available directly in this object, as it would
+/// be null in the case of an uninstallation
 abstract class ApplicationEvent {
   final DateTime time;
 
@@ -360,8 +373,10 @@ abstract class ApplicationEvent {
   // ignore: empty_constructor_bodies, avoid_unused_constructor_parameters
   ApplicationEvent._fromMap(Map<Object, Object> map) : time = DateTime.now();
 
+  /// The package name of the application related to this event
   String get packageName;
 
+  /// The event type will help check if the app is installed or not
   ApplicationEventType get event;
 
   @override
