@@ -55,11 +55,11 @@ class DeviceApps {
         }
         return list;
       } else {
-        return <Application>[];
+        return List<Application>.empty();
       }
     } catch (err) {
       print(err);
-      return <Application>[];
+      return List<Application>.empty();
     }
   }
 
