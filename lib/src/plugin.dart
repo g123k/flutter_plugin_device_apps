@@ -115,11 +115,7 @@ class DeviceApps {
       throw Exception('The package name can not be empty');
     }
     return await (_methodChannel.invokeMethod(
-      'openApp',
-      <String, String>{
-        'package_name': packageName,
-      },
-    ) as FutureOr<bool>);
+        'openApp', <String, String>{'package_name': packageName}));
   }
 
   /// Launch the Settings screen of the app based on its [packageName]
@@ -131,11 +127,7 @@ class DeviceApps {
     }
 
     return await (_methodChannel.invokeMethod(
-      'openAppSettings',
-      <String, String>{
-        'package_name': packageName,
-      },
-    ) as FutureOr<bool>);
+        'openAppSettings', <String, String>{'package_name': packageName}));
   }
 
   /// Listen to app changes: installations, uninstallations, updates, enabled or
@@ -144,9 +136,10 @@ class DeviceApps {
   static Stream<ApplicationEvent> listenToAppsChanges() {
     return _eventChannel
         .receiveBroadcastStream()
-        .map(((dynamic event) =>
-            ApplicationEvent._(event as Map<Object, Object>)))
-        .handleError((Object err) => null);
+        .map(((Object event) =>
+                ApplicationEvent._(event as Map<Object, Object>))
+            as Function(dynamic))
+        .handleError((Object err) => null) as Stream<ApplicationEvent>;
   }
 }
 
@@ -195,7 +188,7 @@ class Application extends _BaseApplication {
 
   /// Whether the app is enabled (installed and visible)
   /// or disabled (installed, but not visible)
-  final bool? enabled;
+  final bool enabled;
 
   factory Application._(Map<Object, Object> map) {
     if (map.length == 0) {
@@ -217,7 +210,7 @@ class Application extends _BaseApplication {
         systemApp = map['system_app'] as bool,
         installTimeMillis = map['install_time'] as int,
         updateTimeMillis = map['update_time'] as int,
-        enabled = map['is_enabled'] as bool?,
+        enabled = map['is_enabled'] as bool,
         category = _parseCategory(map['category']),
         super._fromMap(map);
 
