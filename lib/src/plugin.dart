@@ -211,7 +211,7 @@ class Application extends _BaseApplication {
   /// [https://developer.android.com/reference/kotlin/android/content/pm/ApplicationInfo]
   /// [category] is null on Android < 26
   static ApplicationCategory _parseCategory(Object? category) {
-    if (category == null || (category is num && category < 0)) {
+    if (category is num && category < 0) {
       return ApplicationCategory.undefined;
     } else if (category == 0) {
       return ApplicationCategory.game;
