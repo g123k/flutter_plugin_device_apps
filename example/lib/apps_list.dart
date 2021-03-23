@@ -55,7 +55,7 @@ class _AppsListScreenContent extends StatelessWidget {
   final bool onlyAppsWithLaunchIntent;
 
   const _AppsListScreenContent(
-      {Key key,
+      {Key? key,
       this.includeSystemApps: false,
       this.onlyAppsWithLaunchIntent: false})
       : super(key: key);
@@ -71,8 +71,8 @@ class _AppsListScreenContent extends StatelessWidget {
         if (data.data == null) {
           return const Center(child: CircularProgressIndicator());
         } else {
-          List<Application> apps = data.data;
-          print(apps);
+          List<Application> apps = data.data!;
+
           return Scrollbar(
             child: ListView.builder(
                 itemBuilder: (BuildContext context, int position) {
@@ -131,17 +131,15 @@ class _AppsListScreenContent extends StatelessWidget {
 
 class _AppButtonAction extends StatelessWidget {
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
-  _AppButtonAction({@required this.label, @required this.onPressed})
-      : assert(label != null),
-        assert(onPressed != null);
+  _AppButtonAction({required this.label, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () {
-        onPressed();
+        onPressed?.call();
         Navigator.of(context).maybePop();
       },
       child: Text(label),

@@ -11,7 +11,7 @@ class AppsEventsScreen extends StatefulWidget {
 
 class _AppsEventsScreenState extends State<AppsEventsScreen> {
   final List<ApplicationEvent> _events = <ApplicationEvent>[];
-  StreamSubscription<ApplicationEvent> _subscription;
+  late StreamSubscription<ApplicationEvent> _subscription;
 
   @override
   void initState() {
@@ -49,7 +49,7 @@ class _AppsEventsScreenState extends State<AppsEventsScreen> {
 
   @override
   void dispose() {
-    _subscription?.cancel();
+    _subscription.cancel();
     super.dispose();
   }
 }
@@ -57,7 +57,7 @@ class _AppsEventsScreenState extends State<AppsEventsScreen> {
 class _EventsList extends StatelessWidget {
   final Iterable<ApplicationEvent> _events;
 
-  _EventsList({@required List<ApplicationEvent> events})
+  _EventsList({required List<ApplicationEvent> events})
       : _events = events.reversed;
 
   @override
@@ -78,7 +78,7 @@ class _EventsList extends StatelessWidget {
 class _AppEventItem extends StatelessWidget {
   final ApplicationEvent event;
 
-  _AppEventItem({@required this.event}) : assert(event != null);
+  _AppEventItem({required this.event});
 
   @override
   Widget build(BuildContext context) {
@@ -114,8 +114,6 @@ class _AppEventItemType extends StatelessWidget {
       case ApplicationEventType.disabled:
         return 'Disabled';
     }
-
-    throw Exception('Unknown event type $type');
   }
 
   @override

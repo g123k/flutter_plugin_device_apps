@@ -36,17 +36,18 @@ class DeviceApps {
         'include_app_icons': includeAppIcons,
         'only_apps_with_launch_intent': onlyAppsWithLaunchIntent
       });
-      if (apps is Iterable<Object>) {
+
+      if (apps is Iterable) {
         List<Application> list = <Application>[];
         for (Object app in apps) {
-          if (app is Map<Object, Object>) {
+          if (app is Map) {
             try {
               list.add(Application._(app));
-            } catch (e) {
+            } catch (e, trace) {
               if (e is AssertionError) {
                 print('[DeviceApps] Unable to add the following app: $app');
               } else {
-                print('[DeviceApps] $e');
+                print('[DeviceApps] $e $trace');
               }
             }
           }
@@ -77,6 +78,7 @@ class DeviceApps {
         'package_name': packageName,
         'include_app_icon': includeAppIcon
       });
+
       if (app != null && app is Map<Object, Object>) {
         return Application._(app);
       } else {
@@ -94,33 +96,47 @@ class DeviceApps {
     if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
     }
-    return _methodChannel.invokeMethod(
-            'isAppInstalled', <String, String>{'package_name': packageName})
-        as Future<bool>;
+
+    return _methodChannel
+        .invokeMethod<bool>(
+          'isAppInstalled',
+          <String, String>{'package_name': packageName},
+        )
+        .then((bool? value) => value ?? false)
+        .catchError((dynamic err) => false);
   }
 
   /// Launch an app based on its [packageName]
   /// You will then receive in return if the app was opened
   /// (will be false if the app is not installed, or if no "launcher" intent is
   /// provided by this app)
-  static Future<bool> openApp(String packageName) async {
+  static Future<bool> openApp(String packageName) {
     if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
     }
-    return await (_methodChannel.invokeMethod(
-        'openApp', <String, String>{'package_name': packageName}));
+
+    return _methodChannel
+        .invokeMethod<bool>(
+          'openApp',
+          <String, String>{'package_name': packageName},
+        )
+        .then((bool? value) => value ?? false)
+        .catchError((dynamic err) => false);
   }
 
   /// Launch the Settings screen of the app based on its [packageName]
   /// You will then receive in return if the app was opened
   /// (will be false if the app is not installed)
-  static Future<bool> openAppSettings(String packageName) async {
+  static Future<bool> openAppSettings(String packageName) {
     if (packageName.isEmpty) {
       throw Exception('The package name can not be empty');
     }
 
-    return await (_methodChannel.invokeMethod(
-        'openAppSettings', <String, String>{'package_name': packageName}));
+    return _methodChannel
+        .invokeMethod<bool>(
+            'openAppSettings', <String, String>{'package_name': packageName})
+        .then((bool? value) => value ?? false)
+        .catchError((dynamic err) => false);
   }
 
   /// Listen to app changes: installations, uninstallations, updates, enabled or
@@ -129,10 +145,9 @@ class DeviceApps {
   static Stream<ApplicationEvent> listenToAppsChanges() {
     return _eventChannel
         .receiveBroadcastStream()
-        .map(((Object event) =>
-                ApplicationEvent._(event as Map<Object, Object>))
-            as Function(dynamic))
-        .handleError((Object err) => null) as Stream<ApplicationEvent>;
+        .map(((dynamic event) =>
+            ApplicationEvent._(event as Map<Object, Object>)))
+        .handleError((Object err) => null);
   }
 }
 
@@ -140,7 +155,8 @@ class DeviceApps {
 class _BaseApplication {
   /// Name of the package
   final String packageName;
-  _BaseApplication._fromMap(Map<Object, Object> map)
+
+  _BaseApplication._fromMap(Map<dynamic, dynamic> map)
       : packageName = map['package_name'] as String;
 }
 
@@ -156,7 +172,7 @@ class Application extends _BaseApplication {
   /// Public name of the application (eg: 1.0.0)
   /// The version name of this package, as specified by the <manifest> tag's
   /// `versionName` attribute
-  final String versionName;
+  final String? versionName;
 
   /// Unique version id for the application
   final int versionCode;
@@ -183,7 +199,7 @@ class Application extends _BaseApplication {
   /// or disabled (installed, but not visible)
   final bool enabled;
 
-  factory Application._(Map<Object, Object> map) {
+  factory Application._(Map<dynamic, dynamic> map) {
     if (map.length == 0) {
       throw Exception('The map can not be null!');
     }
@@ -194,10 +210,10 @@ class Application extends _BaseApplication {
     }
   }
 
-  Application._fromMap(Map<Object, Object> map)
+  Application._fromMap(Map<dynamic, dynamic> map)
       : appName = map['app_name'] as String,
         apkFilePath = map['apk_file_path'] as String,
-        versionName = map['version_name'] as String,
+        versionName = map['version_name'] as String?,
         versionCode = map['version_code'] as int,
         dataDir = map['data_dir'] as String,
         systemApp = map['system_app'] as bool,
@@ -307,7 +323,7 @@ class Application extends _BaseApplication {
 class ApplicationWithIcon extends Application {
   final String _icon;
 
-  ApplicationWithIcon._fromMap(Map<Object, Object> map)
+  ApplicationWithIcon._fromMap(Map<dynamic, dynamic> map)
       : _icon = map['app_icon'] as String,
         super._fromMap(map);
 
@@ -338,7 +354,7 @@ class ApplicationWithIcon extends Application {
 abstract class ApplicationEvent {
   final DateTime time;
 
-  factory ApplicationEvent._(Map<Object, Object> map) {
+  factory ApplicationEvent._(Map<dynamic, dynamic> map) {
     Object? eventType = map['event_type'];
 
     if (eventType is! String) {
@@ -362,7 +378,7 @@ abstract class ApplicationEvent {
   }
 
   // ignore: empty_constructor_bodies, avoid_unused_constructor_parameters
-  ApplicationEvent._fromMap(Map<Object, Object> map) : time = DateTime.now();
+  ApplicationEvent._fromMap(Map<dynamic, dynamic> map) : time = DateTime.now();
 
   /// The package name of the application related to this event
   String get packageName;
@@ -389,7 +405,7 @@ abstract class ApplicationEvent {
 class ApplicationEventInstalled extends ApplicationEvent {
   final Application application;
 
-  ApplicationEventInstalled._fromMap(Map<Object, Object> map)
+  ApplicationEventInstalled._fromMap(Map<dynamic, dynamic> map)
       : application = Application._(map),
         super._fromMap(map);
 
@@ -419,7 +435,7 @@ class ApplicationEventInstalled extends ApplicationEvent {
 class ApplicationEventUpdated extends ApplicationEvent {
   final Application application;
 
-  ApplicationEventUpdated._fromMap(Map<Object, Object> map)
+  ApplicationEventUpdated._fromMap(Map<dynamic, dynamic> map)
       : application = Application._(map),
         super._fromMap(map);
 
@@ -449,7 +465,7 @@ class ApplicationEventUpdated extends ApplicationEvent {
 class ApplicationEventUninstalled extends ApplicationEvent {
   final _BaseApplication _application;
 
-  ApplicationEventUninstalled._fromMap(Map<Object, Object> map)
+  ApplicationEventUninstalled._fromMap(Map<dynamic, dynamic> map)
       : _application = _BaseApplication._fromMap(map),
         super._fromMap(map);
 
@@ -479,7 +495,7 @@ class ApplicationEventUninstalled extends ApplicationEvent {
 class ApplicationEventEnabled extends ApplicationEvent {
   final Application application;
 
-  ApplicationEventEnabled._fromMap(Map<Object, Object> map)
+  ApplicationEventEnabled._fromMap(Map<dynamic, dynamic> map)
       : application = Application._(map),
         super._fromMap(map);
 
@@ -509,7 +525,7 @@ class ApplicationEventEnabled extends ApplicationEvent {
 class ApplicationEventDisabled extends ApplicationEvent {
   final Application application;
 
-  ApplicationEventDisabled._fromMap(Map<Object, Object> map)
+  ApplicationEventDisabled._fromMap(Map<dynamic, dynamic> map)
       : application = Application._(map),
         super._fromMap(map);
 
