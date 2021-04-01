@@ -79,7 +79,7 @@ class DeviceApps {
         'include_app_icon': includeAppIcon
       });
 
-      if (app != null && app is Map<Object, Object>) {
+      if (app != null && app is Map<dynamic, dynamic>) {
         return Application._(app);
       } else {
         return null;
