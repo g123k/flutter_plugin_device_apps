@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.2] - 01th April 2021
+
+* Fix bug #69
+
 ## [2.0.1] - 23th March 2021
 
 * Fix many regressions introduced in 2.0.0
