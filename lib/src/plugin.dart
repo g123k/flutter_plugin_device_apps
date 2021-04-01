@@ -146,7 +146,7 @@ class DeviceApps {
     return _eventChannel
         .receiveBroadcastStream()
         .map(((dynamic event) =>
-            ApplicationEvent._(event as Map<Object, Object>)))
+            ApplicationEvent._(event as Map<dynamic, dynamic>)))
         .handleError((Object err) => null);
   }
 }
