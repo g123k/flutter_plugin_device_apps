@@ -4,12 +4,38 @@
 
 A plugin to list installed applications on an Android device (⚠️ iOS is not supported). You can also listen to app changes (eg: installations, updates…)
 
+## BREAKING CHANGE - 05th May 2021
+
+[May 5 2021](https://support.google.com/googleplay/android-developer/answer/10158779) will mark a breaking change on how applications requesting [`QUERY_ALL_PACKAGES`](https://developer.android.com/reference/kotlin/android/Manifest.permission#query_all_packages) are accepted in the Google Play (and only this app store !). [Quoting from the doc](https://support.google.com/googleplay/android-developer/answer/10158779):
+
+
+> Permitted use involves apps that must discover any and all installed apps on the device, for awareness or interoperability purposes may have eligibility for the permission. Permitted use includes; device search, antivirus apps, file managers, and browsers.
+> 
+> Apps granted access to this permission must comply with the User Data policies, including the Prominent Disclosure and Consent requirements, and may not extend its use to undisclosed or invalid purposes.
+
+
+More info here: https://support.google.com/googleplay/android-developer/answer/10158779
+
+**Starting with version 2.1.0 of this plugin, the [`QUERY_ALL_PACKAGES`](https://developer.android.com/reference/kotlin/android/Manifest.permission#query_all_packages) permission won't be requested by default!**
+
 ## Change with Android 11
 
 Starting with Android 11, Android applications targeting API level 30, willing to list "external" applications have to declare a new "normal" permission in their `AndroidManifest.xml` file called [`QUERY_ALL_PACKAGES`](https://developer.android.com/reference/kotlin/android/Manifest.permission#query_all_packages). A few notes about this:
 
 - A normal permission doesn't require the user consent
-- Don't worry, this plugin automatically adds the permission for you
+- Before version 2.1 of this plugin, the permission was requested automatically. This is not the case anymore
+
+If you want to use, simply add the following to your AndroidManifest.xml:
+
+```xml
+<manifest...>
+
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+
+</manifest>
+```
+
+
 
 However, publishing applications on the Google Play with this kind of feature **may change** in the future. [Quoting from the documentation](https://developer.android.com/reference/kotlin/android/Manifest.permission#query_all_packages):
 

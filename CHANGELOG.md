@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.1.0] - 12th April 2021
+
+* [BREAKING CHANGE] [Following Google Play change with the `QUERY_ALL_PACKAGES`](https://support.google.com/googleplay/android-developer/answer/10158779), by default this plugin won't request anymore this permission.
+If you want to keep the current behavior, you have to add the permission again to the Android Manifest (cf `README`).
+
 ## [2.0.2] - 01th April 2021
 
 * Fix bug #69
