@@ -128,6 +128,16 @@ public class DeviceAppsPlugin implements
                     result.success(openAppSettings(packageName));
                 }
                 break;
+            case "getCurrentLauncherApp":
+                PackageManager localPackageManager = context.getPackageManager();
+                Intent intent = new Intent("android.intent.action.MAIN");
+                intent.addCategory("android.intent.category.HOME");
+                String packageName = localPackageManager
+                        .resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+                        .activityInfo
+                        .packageName;
+                result.success(packageName);
+                break;
             default:
                 result.notImplemented();
         }
