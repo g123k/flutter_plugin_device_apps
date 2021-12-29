@@ -139,6 +139,14 @@ class DeviceApps {
         .catchError((dynamic err) => false);
   }
 
+  /// Get the current Launcher app's package name
+  static Future<String?> getCurrentLauncherApp() {
+    return _methodChannel
+        .invokeMethod<String?>('getCurrentLauncherApp')
+        .then((String? value) => value)
+        .catchError((dynamic err) => null);
+  }
+
   /// Listen to app changes: installations, uninstallations, updates, enabled or
   /// disabled. As it is a [Stream], don't hesite to filter data if the content
   /// is too verbose for you
