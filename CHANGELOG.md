@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.2.0] - 1st April 2022
+
+* Uninstall an application
+* Fix issue #81
+
 ## [2.1.1] - 23th April 2021
 
 * AndroidX annotations are now required as a dependency 
