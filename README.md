@@ -106,6 +106,28 @@ To open an application settings screen
 DeviceApps.openAppSettings('com.frandroid.app');
 ```
 
+## Uninstall an application
+
+To open the screen to uninstall an application:
+
+1. Add this permission to the `AndroidManifest.xml` file:
+
+```xml
+<manifest...>
+
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+
+</manifest>
+```
+
+2. Call this method:
+
+```dart
+DeviceApps.uninstallApp('com.frandroid.app');
+```
+
+
+
 ## Include application icon
 
 When calling `getInstalledApplications()` or `getApp()` methods, you can also ask for the icon.

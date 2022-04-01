@@ -100,7 +100,9 @@ class DeviceApps {
     return _methodChannel
         .invokeMethod<bool>(
           'isAppInstalled',
-          <String, String>{'package_name': packageName},
+          <String, String>{
+            'package_name': packageName,
+          },
         )
         .then((bool? value) => value ?? false)
         .catchError((dynamic err) => false);
@@ -118,7 +120,9 @@ class DeviceApps {
     return _methodChannel
         .invokeMethod<bool>(
           'openApp',
-          <String, String>{'package_name': packageName},
+          <String, String>{
+            'package_name': packageName,
+          },
         )
         .then((bool? value) => value ?? false)
         .catchError((dynamic err) => false);
@@ -133,8 +137,24 @@ class DeviceApps {
     }
 
     return _methodChannel
-        .invokeMethod<bool>(
-            'openAppSettings', <String, String>{'package_name': packageName})
+        .invokeMethod<bool>('openAppSettings', <String, String>{
+          'package_name': packageName,
+        })
+        .then((bool? value) => value ?? false)
+        .catchError((dynamic err) => false);
+  }
+
+  /// Uninstall an application by giving its [packageName]
+  /// Note: It will only open the Android's screen
+  static Future<bool> uninstallApp(String packageName) {
+    if (packageName.isEmpty) {
+      throw Exception('The package name can not be empty');
+    }
+
+    return _methodChannel
+        .invokeMethod<bool>('uninstallApp', <String, String>{
+          'package_name': packageName,
+        })
         .then((bool? value) => value ?? false)
         .catchError((dynamic err) => false);
   }
@@ -179,7 +199,7 @@ class Application extends _BaseApplication {
 
   /// Full path to the default directory assigned to the package for its
   /// persistent data
-  final String dataDir;
+  final String? dataDir;
 
   /// Whether the application is installed in the device's system image
   /// An application downloaded by the user won't be a system app
@@ -262,6 +282,13 @@ class Application extends _BaseApplication {
   // Will return [false] otherwise
   Future<bool> openSettingsScreen() {
     return DeviceApps.openAppSettings(packageName);
+  }
+
+  // Uninstall app
+  // Will return [true] is the screen to uninstall the app is visible
+  // Will return [false] otherwise
+  Future<bool> uninstallApp() {
+    return DeviceApps.uninstallApp(packageName);
   }
 
   @override

@@ -123,6 +123,10 @@ class _AppsListScreenContent extends StatelessWidget {
                 label: 'Open app settings',
                 onPressed: () => app.openSettingsScreen(),
               ),
+              _AppButtonAction(
+                label: 'Uninstall app',
+                onPressed: () async => app.uninstallApp(),
+              ),
             ],
           );
         });

@@ -128,6 +128,14 @@ public class DeviceAppsPlugin implements
                     result.success(openAppSettings(packageName));
                 }
                 break;
+            case "uninstallApp":
+                if (!call.hasArgument("package_name") || TextUtils.isEmpty(call.argument("package_name").toString())) {
+                    result.error("ERROR", "Empty or null package name", null);
+                } else {
+                    String packageName = call.argument("package_name").toString();
+                    result.success(uninstallApp(packageName));
+                }
+                break;
             default:
                 result.notImplemented();
         }
@@ -267,6 +275,24 @@ public class DeviceAppsPlugin implements
         }
 
         return map;
+    }
+
+    private boolean uninstallApp(@NonNull String packageName) {
+        if (!isAppInstalled(packageName)) {
+            Log.w(LOG_TAG, "Application with package name \"" + packageName + "\" is not installed on this device");
+            return false;
+        }
+
+        Intent appSettingsIntent = new Intent(Intent.ACTION_DELETE);
+        appSettingsIntent.setData(Uri.parse("package:" + packageName));
+        appSettingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        if (IntentUtils.isIntentOpenable(appSettingsIntent, context)) {
+            context.startActivity(appSettingsIntent);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
