@@ -1,5 +1,8 @@
 package fr.g123k.deviceapps;
 
+import static fr.g123k.deviceapps.utils.Base64Utils.encodeToBase64;
+import static fr.g123k.deviceapps.utils.DrawableUtils.getBitmapFromDrawable;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -34,9 +37,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-
-import static fr.g123k.deviceapps.utils.Base64Utils.encodeToBase64;
-import static fr.g123k.deviceapps.utils.DrawableUtils.getBitmapFromDrawable;
 
 /**
  * DeviceAppsPlugin
@@ -79,6 +79,11 @@ public class DeviceAppsPlugin implements
     @SuppressWarnings("ConstantConditions")
     public void onMethodCall(MethodCall call, @NonNull final Result result) {
         switch (call.method) {
+            case "getInstalledPackagesCount":
+                PackageManager packageManager = context.getPackageManager();
+                List<PackageInfo> apps = packageManager.getInstalledPackages(0);
+                result.success(apps.size());
+                break;
             case "getInstalledApps":
                 boolean systemApps = call.hasArgument("system_apps") && (Boolean) (call.argument("system_apps"));
                 boolean includeAppIcons = call.hasArgument("include_app_icons") && (Boolean) (call.argument("include_app_icons"));
@@ -143,28 +148,32 @@ public class DeviceAppsPlugin implements
 
     private void fetchInstalledApps(final boolean includeSystemApps, final boolean includeAppIcons, final boolean onlyAppsWithLaunchIntent, final InstalledAppsCallback callback) {
         asyncWork.run(new Runnable() {
-
             @Override
             public void run() {
-                List<Map<String, Object>> installedApps = getInstalledApps(includeSystemApps, includeAppIcons, onlyAppsWithLaunchIntent);
+                OnAppLoaded onAppLoadedCallback = new OnAppLoaded() {
+                    @Override
+                    public void onAppAvailable(Map<String, Object> app) {
+                        apps.add(app);
+                    }
+                };
+
+                getInstalledApps(includeSystemApps, includeAppIcons, onlyAppsWithLaunchIntent, onAppLoadedCallback);
 
                 if (callback != null) {
-                    callback.onInstalledAppsListAvailable(installedApps);
+                    callback.onInstalledAppsListAvailable(onAppLoadedCallback.apps);
                 }
             }
-
         });
     }
 
-    private List<Map<String, Object>> getInstalledApps(boolean includeSystemApps, boolean includeAppIcons, boolean onlyAppsWithLaunchIntent) {
+    private void getInstalledApps(boolean includeSystemApps, boolean includeAppIcons, boolean onlyAppsWithLaunchIntent, OnAppLoaded callback) {
         if (context == null) {
             Log.e(LOG_TAG, "Context is null");
-            return new ArrayList<>(0);
+            return;
         }
 
         PackageManager packageManager = context.getPackageManager();
         List<PackageInfo> apps = packageManager.getInstalledPackages(0);
-        List<Map<String, Object>> installedApps = new ArrayList<>(apps.size());
 
         for (PackageInfo packageInfo : apps) {
             if (!includeSystemApps && isSystemApp(packageInfo)) {
@@ -178,10 +187,9 @@ public class DeviceAppsPlugin implements
                     packageInfo,
                     packageInfo.applicationInfo,
                     includeAppIcons);
-            installedApps.add(map);
-        }
 
-        return installedApps;
+            callback.onAppAvailable(map);
+        }
     }
 
     private boolean openApp(@NonNull String packageName) {
@@ -295,14 +303,59 @@ public class DeviceAppsPlugin implements
         return false;
     }
 
+    private void attachAppsChangedListener(Object arguments, final EventChannel.EventSink events) {
+        if (appsListener == null) {
+            appsListener = new DeviceAppsChangedListener(this);
+        }
+
+        appsListener.register(context, events);
+    }
+
+    private void attachGetInstalledAppsListener(Object arguments, final EventChannel.EventSink events) {
+        HashMap args = (HashMap) arguments;
+        final boolean systemApps = args.containsKey("system_apps") && (boolean) args.get("system_apps");
+        final boolean includeAppIcons = args.containsKey("include_app_icons") && (boolean) args.get("include_app_icons");
+        final boolean onlyAppsWithLaunchIntent = args.containsKey("only_apps_with_launch_intent") && (boolean) args.get("only_apps_with_launch_intent");
+
+        asyncWork.run(new Runnable() {
+            @Override
+            public void run() {
+                getInstalledApps(systemApps, includeAppIcons, onlyAppsWithLaunchIntent, new OnAppLoaded() {
+                    @Override
+                    public void onAppAvailable(final Map<String, Object> app) {
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                events.success(app);
+                            }
+                        });
+                    }
+                });
+
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        events.endOfStream();
+                    }
+                });
+            }
+        });
+    }
+
     @Override
     public void onListen(Object arguments, final EventChannel.EventSink events) {
         if (context != null) {
-            if (appsListener == null) {
-                appsListener = new DeviceAppsChangedListener(this);
-            }
+            HashMap args = (HashMap) arguments;
+            String event = (String) args.get("event");
 
-            appsListener.register(context, events);
+            switch (event) {
+                case "listenToAppsChanges":
+                    attachAppsChangedListener(arguments, events);
+                    break;
+                case "getInstalledApps":
+                    attachGetInstalledAppsListener(arguments, events);
+                    break;
+            }
         }
     }
 
@@ -378,4 +431,10 @@ public class DeviceAppsPlugin implements
 
         context = null;
     }
+}
+
+interface OnAppLoaded {
+    List<Map<String, Object>> apps = new ArrayList<>(0);
+
+    void onAppAvailable(Map<String, Object> app);
 }

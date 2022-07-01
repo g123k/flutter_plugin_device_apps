@@ -16,6 +16,23 @@ class DeviceApps {
   static const EventChannel _eventChannel =
       EventChannel('g123k/device_apps_events');
 
+  static Stream<Application> streamInstalledApplications({
+    bool includeSystemApps: false,
+    bool includeAppIcons: false,
+    bool onlyAppsWithLaunchIntent: false,
+  }) {
+    final Stream<dynamic> apps = _eventChannel.receiveBroadcastStream(
+      <String, dynamic>{
+        'system_apps': includeSystemApps,
+        'include_app_icons': includeAppIcons,
+        'only_apps_with_launch_intent': onlyAppsWithLaunchIntent,
+        'event': 'getInstalledApps',
+      },
+    );
+
+    return apps.map<Application>((dynamic app) => Application._(app));
+  }
+
   /// List installed applications on the device
   /// [includeSystemApps] will also include system apps (or pre-installed) like
   /// Phone, Settings...
@@ -108,6 +125,13 @@ class DeviceApps {
         .catchError((dynamic err) => false);
   }
 
+  static Future<int> getInstalledPackagesCount() {
+    return _methodChannel
+        .invokeMethod<int>('getInstalledPackagesCount')
+        .then((int? value) => value ?? 0)
+        .catchError((dynamic err) => 0);
+  }
+
   /// Launch an app based on its [packageName]
   /// You will then receive in return if the app was opened
   /// (will be false if the app is not installed, or if no "launcher" intent is
@@ -164,7 +188,9 @@ class DeviceApps {
   /// is too verbose for you
   static Stream<ApplicationEvent> listenToAppsChanges() {
     return _eventChannel
-        .receiveBroadcastStream()
+        .receiveBroadcastStream(
+          <String, dynamic>{'event': 'listenToAppsChanges'},
+        )
         .map(((dynamic event) =>
             ApplicationEvent._(event as Map<dynamic, dynamic>)))
         .handleError((Object err) => null);
