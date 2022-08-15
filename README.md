@@ -82,6 +82,14 @@ To get a specific application info, please provide its package name:
 Application app = await DeviceApps.getApp('com.frandroid.app');
 ```
 
+## Get an application from storage
+
+To get a specific application info from storage, please provide its apk file path:
+
+```dart
+Application app = await DeviceApps.getAppFromStorage('/sdcard/Download/com.frandroid.app.apk');
+```
+
 ## Check if an application is installed
 
 To check if an app is installed (via its package name):
@@ -130,7 +138,7 @@ DeviceApps.uninstallApp('com.frandroid.app');
 
 ## Include application icon
 
-When calling `getInstalledApplications()` or `getApp()` methods, you can also ask for the icon.
+When calling `getInstalledApplications()`, `getApp()` or `getAppFromStorage()` methods, you can also ask for the icon.
 To display the image, just call:
 
 ```dart

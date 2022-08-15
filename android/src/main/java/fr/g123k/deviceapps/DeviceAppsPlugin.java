@@ -104,6 +104,15 @@ public class DeviceAppsPlugin implements
                     result.success(getApp(packageName, includeAppIcon));
                 }
                 break;
+            case "getAppFromStorage":
+                if (!call.hasArgument("apk_file_path") || TextUtils.isEmpty(call.argument("apk_file_path").toString())) {
+                    result.error("ERROR", "Empty or null apk file path", null);
+                } else {
+                    String apkFilePath = call.argument("apk_file_path").toString();
+                    boolean includeAppIcon = call.hasArgument("include_app_icon") && (Boolean) (call.argument("include_app_icon"));
+                    result.success(getAppFromStorage(apkFilePath, includeAppIcon));
+                }
+                break;
             case "isAppInstalled":
                 if (!call.hasArgument("package_name") || TextUtils.isEmpty(call.argument("package_name").toString())) {
                     result.error("ERROR", "Empty or null package name", null);
@@ -236,6 +245,22 @@ public class DeviceAppsPlugin implements
             PackageManager packageManager = context.getPackageManager();
             PackageInfo packageInfo = packageManager.getPackageInfo(packageName, 0);
 
+            return getAppData(packageManager,
+                    packageInfo,
+                    packageInfo.applicationInfo,
+                    includeAppIcon);
+        } catch (PackageManager.NameNotFoundException ignored) {
+            return null;
+        }
+    }
+
+    private Map<String, Object> getAppFromStorage(String apkFilePath, boolean includeAppIcon) {
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            PackageInfo packageInfo = packageManager.getPackageArchiveInfo(apkFilePath, 0);
+            
+            packageInfo.applicationInfo.sourceDir = apkFilePath;
+            packageInfo.applicationInfo.publicSourceDir = apkFilePath;
             return getAppData(packageManager,
                     packageInfo,
                     packageInfo.applicationInfo,

@@ -90,6 +90,34 @@ class DeviceApps {
     }
   }
 
+  /// Provide all information for a given app by its [apkFilePath]
+  /// [includeAppIcon] will also include the icon for the app.
+  /// To get it, you have to cast the object to [ApplicationWithIcon].
+  static Future<Application?> getAppFromStorage(
+    String apkFilePath, [
+    bool includeAppIcon = false,
+  ]) async {
+    if (apkFilePath.isEmpty) {
+      throw Exception('The apk file path can not be empty');
+    }
+    try {
+      final Object? app = await _methodChannel.invokeMethod(
+          'getAppFromStorage', <String, Object>{
+        'apk_file_path': apkFilePath,
+        'include_app_icon': includeAppIcon
+      });
+
+      if (app != null && app is Map<dynamic, dynamic>) {
+        return Application._(app);
+      } else {
+        return null;
+      }
+    } catch (err) {
+      print(err);
+      return null;
+    }
+  }
+
   /// Returns whether a given [packageName] is installed on the device
   /// You will then receive in return a boolean
   static Future<bool> isAppInstalled(String packageName) {
