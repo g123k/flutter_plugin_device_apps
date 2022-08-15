@@ -257,7 +257,7 @@ public class DeviceAppsPlugin implements
     private Map<String, Object> getAppFromStorage(String apkFilePath, boolean includeAppIcon) {
         try {
             PackageManager packageManager = context.getPackageManager();
-            PackageInfo packageInfo = packageManager.getPackageArchiveInfo(apkFilePath, 0);
+            PackageInfo packageInfo = packageManager.getPackageArchiveInfo(apkFilePath, PackageManager.INSTALL_REASON_UNKNOWN);
             
             packageInfo.applicationInfo.sourceDir = apkFilePath;
             packageInfo.applicationInfo.publicSourceDir = apkFilePath;
@@ -265,7 +265,7 @@ public class DeviceAppsPlugin implements
                     packageInfo,
                     packageInfo.applicationInfo,
                     includeAppIcon);
-        } catch (PackageManager.NameNotFoundException ignored) {
+        } catch (Exception ignored) {
             return null;
         }
     }
@@ -291,12 +291,9 @@ public class DeviceAppsPlugin implements
         }
 
         if (includeAppIcon) {
-            try {
-                Drawable icon = packageManager.getApplicationIcon(pInfo.packageName);
-                String encodedImage = encodeToBase64(getBitmapFromDrawable(icon), Bitmap.CompressFormat.PNG, 100);
-                map.put(AppDataConstants.APP_ICON, encodedImage);
-            } catch (PackageManager.NameNotFoundException ignored) {
-            }
+            Drawable icon = pInfo.applicationInfo.loadIcon(packageManager);
+            String encodedImage = encodeToBase64(getBitmapFromDrawable(icon), Bitmap.CompressFormat.PNG, 100);
+            map.put(AppDataConstants.APP_ICON, encodedImage);
         }
 
         return map;
