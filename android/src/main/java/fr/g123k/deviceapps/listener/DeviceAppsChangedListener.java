@@ -15,16 +15,18 @@ import io.flutter.plugin.common.EventChannel;
 public class DeviceAppsChangedListener {
 
     private final DeviceAppsChangedListenerInterface callback;
-    private final Set<EventChannel.EventSink> sinks;
+    private Set<EventChannel.EventSink> eventSink;
 
     private BroadcastReceiver appsBroadcastReceiver;
 
     public DeviceAppsChangedListener(DeviceAppsChangedListenerInterface callback) {
         this.callback = callback;
-        this.sinks = new HashSet<>(1);
+        this.eventSink = null;
     }
 
     public void register(@NonNull Context context, EventChannel.EventSink events) {
+        unregister();
+
         if (appsBroadcastReceiver == null) {
             createBroadcastReceiver();
         }
@@ -36,7 +38,7 @@ public class DeviceAppsChangedListener {
         intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         intentFilter.addDataScheme("package");
 
-        sinks.add(events);
+        eventSink = events;
 
         context.registerReceiver(appsBroadcastReceiver, intentFilter);
     }
@@ -75,35 +77,31 @@ public class DeviceAppsChangedListener {
     }
 
     void onPackageInstalled(String packageName) {
-        for (EventChannel.EventSink sink : sinks) {
-            callback.onPackageInstalled(packageName, sink);
-        }
+        callback.onPackageInstalled(packageName, eventSink);
     }
 
     void onPackageUpdated(String packageName) {
-        for (EventChannel.EventSink sink : sinks) {
-            callback.onPackageUpdated(packageName, sink);
-        }
+        callback.onPackageUpdated(packageName, eventSink);
     }
 
     void onPackageUninstalled(String packageName) {
-        for (EventChannel.EventSink sink : sinks) {
-            callback.onPackageUninstalled(packageName, sink);
-        }
+        callback.onPackageUninstalled(packageName, eventSink);
     }
 
     void onPackageChanged(String packageName) {
-        for (EventChannel.EventSink sink : sinks) {
-            callback.onPackageChanged(packageName, sink);
-        }
+        callback.onPackageChanged(packageName, eventSink);
     }
 
     public void unregister(@NonNull Context context) {
         if (appsBroadcastReceiver != null) {
             context.unregisterReceiver(appsBroadcastReceiver);
+            appsBroadcastReceiver = null;
         }
-
-        sinks.clear();
+        
+        if (eventSink != null) {
+            eventSink.endOfStream();
+            eventSink = null;
+        }
     }
 
 }
