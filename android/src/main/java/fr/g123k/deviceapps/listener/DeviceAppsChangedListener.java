@@ -15,7 +15,7 @@ import io.flutter.plugin.common.EventChannel;
 public class DeviceAppsChangedListener {
 
     private final DeviceAppsChangedListenerInterface callback;
-    private Set<EventChannel.EventSink> eventSink;
+    private EventChannel.EventSink eventSink;
 
     private BroadcastReceiver appsBroadcastReceiver;
 
@@ -25,7 +25,7 @@ public class DeviceAppsChangedListener {
     }
 
     public void register(@NonNull Context context, EventChannel.EventSink events) {
-        unregister();
+        unregister(context);
 
         if (appsBroadcastReceiver == null) {
             createBroadcastReceiver();
