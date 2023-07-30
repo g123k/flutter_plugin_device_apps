@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:device_apps/device_apps.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AppsEventsScreen extends StatefulWidget {
@@ -86,7 +85,7 @@ class _AppEventItem extends StatelessWidget {
       children: <Widget>[
         ListTile(
           title: Text(event.packageName),
-          subtitle: _AppEventItemType(event.event),
+          subtitle: _AppEventItemType(event),
           leading: Text('${event.time.hour}:${event.time.minute}'),
         ),
         const Divider()
@@ -98,22 +97,17 @@ class _AppEventItem extends StatelessWidget {
 class _AppEventItemType extends StatelessWidget {
   final String _type;
 
-  _AppEventItemType(ApplicationEventType type)
-      : _type = _extractEventTypeName(type);
+  _AppEventItemType(ApplicationEvent event)
+      : _type = _extractEventTypeName(event);
 
-  static String _extractEventTypeName(ApplicationEventType type) {
-    switch (type) {
-      case ApplicationEventType.installed:
-        return 'Installed';
-      case ApplicationEventType.updated:
-        return 'Updated';
-      case ApplicationEventType.uninstalled:
-        return 'Uninstalled';
-      case ApplicationEventType.enabled:
-        return 'Enabled';
-      case ApplicationEventType.disabled:
-        return 'Disabled';
-    }
+  static String _extractEventTypeName(ApplicationEvent event) {
+    return switch (event) {
+      ApplicationEventInstalled() => 'Installed',
+      ApplicationEventUpdated() => 'Updated',
+      ApplicationEventUninstalled() => 'Uninstalled',
+      ApplicationEventEnabled() => 'Enabled',
+      ApplicationEventDisabled() => 'Disabled',
+    };
   }
 
   @override

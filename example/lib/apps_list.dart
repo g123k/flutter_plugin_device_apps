@@ -56,8 +56,8 @@ class _AppsListScreenContent extends StatelessWidget {
 
   const _AppsListScreenContent(
       {Key? key,
-      this.includeSystemApps: false,
-      this.onlyAppsWithLaunchIntent: false})
+      this.includeSystemApps = false,
+      this.onlyAppsWithLaunchIntent = false})
       : super(key: key);
 
   @override
@@ -80,9 +80,9 @@ class _AppsListScreenContent extends StatelessWidget {
                   return Column(
                     children: <Widget>[
                       ListTile(
-                        leading: app is ApplicationWithIcon
+                        leading: app.icon != null
                             ? CircleAvatar(
-                                backgroundImage: MemoryImage(app.icon),
+                                backgroundImage: MemoryImage(app.icon!),
                                 backgroundColor: Colors.white,
                               )
                             : null,
