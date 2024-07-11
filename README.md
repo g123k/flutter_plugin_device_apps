@@ -1,4 +1,4 @@
-# Device Apps plugin for Flutter
+# Device Apps plugin for Flutter (UNMAINTAINED)
 
 [![Pub](https://img.shields.io/pub/v/device_apps.svg)](https://pub.dartlang.org/packages/device_apps)
 
